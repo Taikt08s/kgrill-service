@@ -18,11 +18,23 @@
 	</properties>
 	<distributionManagement>
 		<repository>
-			<id>github</id>
+			<id>github-kgrill-service</id>
 			<name>GitHub Packages</name>
 			<url>https://maven.pkg.github.com/Taikt08s/kgrill-service</url>
 		</repository>
 	</distributionManagement>
+	<repositories>
+		<repository>
+			<id>github-kgrill-model</id>
+			<name>GitHub Packages</name>
+			<url>https://maven.pkg.github.com/Taikt08s/kgrill-model</url>
+		</repository>
+		<repository>
+			<id>github-kgrill-backend</id>
+			<name>GitHub Packages</name>
+			<url>https://maven.pkg.github.com/Taikt08s/kgrill_backend</url>
+		</repository>
+	</repositories>
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -62,11 +74,6 @@
 		<dependency>
 			<groupId>com.swd392.group2</groupId>
 			<artifactId>kgrill-model</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
-		</dependency>
-		<dependency>
-			<groupId>com.swd392.group2</groupId>
-			<artifactId>kgrill-dto</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
 		<dependency>

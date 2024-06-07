@@ -3,11 +3,11 @@ package com.swd392.group2.kgrill_service.service.impl;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import com.group2.kgrill.config.LogoutServiceConfig;
+import com.group2.kgrill.dto.AuthenticationRequest;
+import com.group2.kgrill.dto.AuthenticationResponse;
+import com.group2.kgrill.dto.GoogleAuthenticationRequest;
+import com.group2.kgrill.dto.RegistrationRequest;
 import com.group2.kgrill.exception.ActivationTokenException;
-import com.swd392.group2.kgrill_dto.dto.AuthenticationRequest;
-import com.swd392.group2.kgrill_dto.dto.AuthenticationResponse;
-import com.swd392.group2.kgrill_dto.dto.GoogleAuthenticationRequest;
-import com.swd392.group2.kgrill_dto.dto.RegistrationRequest;
 import com.swd392.group2.kgrill_model.enums.AuthenticationProvider;
 import com.swd392.group2.kgrill_model.enums.EmailTemplateName;
 import com.swd392.group2.kgrill_model.enums.TokenType;
