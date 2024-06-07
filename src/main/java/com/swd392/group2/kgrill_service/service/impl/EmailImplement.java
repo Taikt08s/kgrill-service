@@ -1,7 +1,5 @@
 package com.swd392.group2.kgrill_service.service.impl;
 
-
-
 import com.swd392.group2.kgrill_model.enums.EmailTemplateName;
 import com.swd392.group2.kgrill_service.service.EmailService;
 import jakarta.mail.MessagingException;
