@@ -32,7 +32,7 @@
 		<repository>
 			<id>github-kgrill-backend</id>
 			<name>GitHub Packages</name>
-			<url>https://maven.pkg.github.com/Taikt08s/kgrill_backend</url>
+			<url>https://maven.pkg.github.com/Taikt08s/kgrill-backend</url>
 		</repository>
 	</repositories>
 	<dependencies>
