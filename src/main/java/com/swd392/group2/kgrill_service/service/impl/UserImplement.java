@@ -64,7 +64,8 @@ public class UserImplement implements UserService {
             user.setAddress(userProfileDto.getAddress());
             user.setGender(userProfileDto.getGender());
             user.setPhone(userProfileDto.getPhone());
-
+            user.setLatitude(userProfileDto.getLatitude());
+            user.setLongitude(userProfileDto.getLongitude());
             User updateUser = userRepository.save(user);
             return mapToUserProfileDto(updateUser);
         } else {
