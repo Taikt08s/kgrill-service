@@ -19,12 +19,12 @@ jobs:
                   <servers>
                     <server>
                       <id>github-kgrill-service</id>
-                      <username>${{ github.actor }}</username>
+                      <username>taikt08s</username>
                       <password>${{ secrets.JAVA_TOKEN_SERVICE }}</password>
                     </server>
                     <server>
                       <id>github-kgrill-model</id>
-                      <username>${{ github.actor }}</username>
+                      <username>taikt08s</username>
                       <password>${{ secrets.JAVA_TOKEN_MODEL }}</password>
                     </server>
                   </servers>
