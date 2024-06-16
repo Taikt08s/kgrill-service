@@ -14,7 +14,7 @@ jobs:
           distribution: 'temurin'
       - name: Publish package
         run: |
-          mvn clean package -DskipTests
+          mvn clean install -DskipTests
           mvn clean deploy --settings .github/settings.xml
         env:
           JAVA_TOKEN_MODEL: ${{ secrets.JAVA_TOKEN_MODEL }}
