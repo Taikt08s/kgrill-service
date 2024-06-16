@@ -12,9 +12,25 @@ jobs:
         with:
           java-version: '17'
           distribution: 'temurin'
-      - name: Publish package
+      - name: Configure Maven settings
+        run: |
+          mkdir -p ~/.m2
+          echo "<settings>
+                  <servers>
+                    <server>
+                      <id>github-kgrill-service</id>
+                      <username>${{ github.actor }}</username>
+                      <password>${{ secrets.JAVA_TOKEN_SERVICE }}</password>
+                    </server>
+                    <server>
+                      <id>github-kgrill-model</id>
+                      <username>${{ github.actor }}</username>
+                      <password>${{ secrets.JAVA_TOKEN_MODEL }}</password>
+                    </server>
+                  </servers>
+                </settings>" > ~/.m2/settings.xml
+
+      - name: Build and deploy the package
         run: |
           mvn clean install -DskipTests
-          mvn clean deploy --settings .github/settings.xml
-        env:
-          JAVA_TOKEN: ${{ secrets.JAVA_TOKEN_SERVICE }}
+          mvn deploy
