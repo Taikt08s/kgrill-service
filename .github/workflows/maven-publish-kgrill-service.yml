@@ -17,5 +17,4 @@ jobs:
           mvn clean install -DskipTests
           mvn clean deploy --settings .github/settings.xml
         env:
-          JAVA_TOKEN_MODEL: ${{ secrets.JAVA_TOKEN_MODEL }}
-          JAVA_TOKEN_SERVICE: ${{ secrets.JAVA_TOKEN_SERVICE }}
+          JAVA_TOKEN: ${{ secrets.JAVA_TOKEN_SERVICE }}
