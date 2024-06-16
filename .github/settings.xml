@@ -5,7 +5,12 @@
     <server>
       <id>github-kgrill-service</id>
       <username>taikt08s</username>
-      <password>${env.JAVA_TOKEN}</password>
+      <password>${env.JAVA_TOKEN_SERVICE}</password>
+    </server>
+    <server>
+      <id>github-kgrill-model</id>
+      <username>taikt08s</username>
+      <password>${env.JAVA_TOKEN_MODEL}</password>
     </server>
   </servers>
 </settings>
