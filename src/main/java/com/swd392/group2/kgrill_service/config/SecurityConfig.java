@@ -1,6 +1,6 @@
 package com.swd392.group2.kgrill_service.config;
 
-import com.group2.kgrill.exception.CustomAuthenticationEntryPoint;
+import com.swd392.group2.kgrill_service.exception.CustomAuthenticationEntryPoint;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
