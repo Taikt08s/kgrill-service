@@ -22,15 +22,8 @@ jobs:
                       <username>taikt08s</username>
                       <password>${{ secrets.JAVA_TOKEN_SERVICE }}</password>
                     </server>
-                    <server>
-                      <id>github-kgrill-model</id>
-                      <username>taikt08s</username>
-                      <password>${{ secrets.JAVA_TOKEN_MODEL }}</password>
-                    </server>
                   </servers>
                 </settings>" > ~/.m2/settings.xml
 
       - name: Build and deploy the package
-        run: |
-          mvn clean install -DskipTests
-          mvn --batch-mode deploy
+        run: mvn --batch-mode deploy
