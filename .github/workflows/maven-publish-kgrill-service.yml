@@ -31,4 +31,6 @@ jobs:
                 </settings>" > ~/.m2/settings.xml
 
       - name: Build and deploy the package
-        run: mvn --batch-mode deploy
+        run: 
+          mvn clean install -DskipTests
+          mvn --batch-mode deploy 
