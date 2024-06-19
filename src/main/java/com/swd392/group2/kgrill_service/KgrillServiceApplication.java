@@ -7,7 +7,7 @@ import org.springframework.context.annotation.ComponentScan;
 
 @SpringBootApplication
 @EntityScan(basePackages = "com.swd392.group2.kgrill_model.model")
-@ComponentScan(basePackages = {"com.swd392.group2.kgrill_model","com.group2.kgrill","com.group2.kgrill.config"})
+@ComponentScan(basePackages = {"com.swd392.group2.kgrill_model"})
 public class KgrillServiceApplication {
 
 	public static void main(String[] args) {
