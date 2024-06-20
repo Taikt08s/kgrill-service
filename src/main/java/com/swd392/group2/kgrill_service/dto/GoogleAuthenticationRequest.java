@@ -17,12 +17,12 @@ import lombok.NoArgsConstructor;
 public class GoogleAuthenticationRequest {
     @Schema(description = "User's first name", example = "Dang Dinh")
     @NotBlank(message = "First name cannot be blank")
-    @JsonProperty("first-name")
+    @JsonProperty("first_name")
     private String firstName;
 
     @Schema(description = "User's last name", example = "Tai")
     @NotBlank(message = "Last name cannot be blank")
-    @JsonProperty("last-name")
+    @JsonProperty("last_name")
     private String lastName;
 
     @Schema(description = "User's email address", example = "john.doe@example.com")
@@ -35,6 +35,6 @@ public class GoogleAuthenticationRequest {
     private String id;
 
     @Schema(description = "Google user photo", example = "http://res.cloudinary.com/torikago/image/upload/vxxx/image.jpg")
-    @JsonProperty("photo-url")
+    @JsonProperty("photo_url")
     private String photoUrl;
 }

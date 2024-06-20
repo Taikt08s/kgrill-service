@@ -48,7 +48,7 @@ public class EmailImplement implements EmailService {
         );
         Map<String, Object> properties = new HashMap<>();
         properties.put("username", username);
-        properties.put("confirmationUrl", confirmationUrl);
+        properties.put("confirmation_url", confirmationUrl);
         properties.put("activation_code", activationCode);
 
         Context context = new Context();

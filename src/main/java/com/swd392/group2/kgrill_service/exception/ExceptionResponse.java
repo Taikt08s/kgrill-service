@@ -18,9 +18,10 @@ import java.util.Map;
 @Schema(description = "Object for exception handling")
 public class ExceptionResponse {
     @Schema(description = "Http Status Code", example = "200")
-    @JsonProperty("http-status")
+    @JsonProperty("http_status")
     private Integer httpStatus;
     @Schema(description = "Time that the error occur", example = "05/29/2024 00:44:00")
+    @JsonProperty("time_stamp")
     private String timestamp;
     @Schema(description = "Error title", example = "Invalid Email/Password")
     private String message;
