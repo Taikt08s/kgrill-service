@@ -1,6 +1,5 @@
 package com.swd392.group2.kgrill_service.config;
 
-
 import com.swd392.group2.kgrill_model.repository.TokenRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
