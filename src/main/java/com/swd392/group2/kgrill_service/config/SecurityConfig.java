@@ -19,8 +19,8 @@ import static org.springframework.security.config.Customizer.withDefaults;
 
 @Configuration
 @EnableWebSecurity
-@RequiredArgsConstructor
 @EnableMethodSecurity(securedEnabled = true)
+@RequiredArgsConstructor
 public class SecurityConfig {
     private final AuthenticationProvider authenticationProvider;
 
