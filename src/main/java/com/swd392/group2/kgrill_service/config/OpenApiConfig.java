@@ -14,10 +14,10 @@ import org.springframework.context.annotation.Configuration;
 @OpenAPIDefinition(info = @Info(
         title = "KGRILL REST API", version = "1.0", description = "API documentation for KGrill food delivery application",
         contact = @Contact(name = "Dang Dinh Tai (Group leader)", email = "styematic@gmail.com", url = "https://github.com/Taikt08s")),
-        security = {@SecurityRequirement(name = "bearer_token")}
+        security = {@SecurityRequirement(name = "bearerToken")}
 )
 @SecuritySchemes({
-        @SecurityScheme(name = "bearer_token", type = SecuritySchemeType.HTTP, scheme = "bearer", bearerFormat = "JWT", in = SecuritySchemeIn.HEADER)
+        @SecurityScheme(name = "bearerToken", type = SecuritySchemeType.HTTP, scheme = "bearer", bearerFormat = "JWT")
 })
 public class OpenApiConfig {
 }
