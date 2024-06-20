@@ -140,7 +140,7 @@ public class AuthImplement implements AuthService {
         var claims = new HashMap<String, Object>();
         var user = ((User) auth.getPrincipal());
 
-        claims.put("fullName", user.fullName());
+        claims.put("full_name", user.fullName());
 
         var jwtAccessToken = jwtService.generateToken(claims, user);
         var jwtRefreshToken = jwtService.generateRefreshToken(user);
@@ -287,7 +287,7 @@ public class AuthImplement implements AuthService {
             }
         }
         var extraClaimsGoogle = new HashMap<String, Object>();
-        extraClaimsGoogle.put("fullName", user.fullName());
+        extraClaimsGoogle.put("full_name", user.fullName());
 
         String jwtAccessToken = jwtService.generateToken(extraClaimsGoogle, user);
         String jwtRefreshToken = jwtService.generateRefreshToken(user);
