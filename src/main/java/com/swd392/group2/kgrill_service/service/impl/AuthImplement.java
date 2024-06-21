@@ -66,7 +66,9 @@ public class AuthImplement implements AuthService {
     public void register(RegistrationRequest request) throws MessagingException, UnsupportedEncodingException {
         var userRole = roleRepository.findByRoleName("USER")
                 .orElseThrow(() -> new IllegalStateException("ROLE USER was not initialized"));
-        userRepository.findByEmail(request.getEmail()).orElseThrow(() -> new RegistrationAccountExistedException("Account already exists"));
+        if (userRepository.findByEmail(request.getEmail()).isPresent()) {
+            throw new RegistrationAccountExistedException("Account already exists");
+        }
         var user = User.builder()
                 .firstName(request.getFirstName())
                 .lastName(request.getLastName())

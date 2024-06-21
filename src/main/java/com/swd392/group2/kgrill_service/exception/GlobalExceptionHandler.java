@@ -107,4 +107,18 @@ public class GlobalExceptionHandler {
                 );
     }
 
+    @ExceptionHandler(RegistrationAccountExistedException.class)
+    public ResponseEntity<ExceptionResponse> handleRegistrationAccountExistedException(RegistrationAccountExistedException exception) {
+        return ResponseEntity
+                .status(HttpStatus.CONFLICT)
+                .body(
+                        ExceptionResponse.builder()
+                                .httpStatus(HttpStatus.CONFLICT.value())
+                                .timestamp(DateUtil.formatTimestamp(new Date()))
+                                .message("Registration failed")
+                                .error(exception.getMessage())
+                                .build()
+                );
+    }
+
 }
