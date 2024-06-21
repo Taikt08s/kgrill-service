@@ -30,7 +30,7 @@ public class ExceptionResponse {
 //    private Set<String> data;
 @Schema(description = "List Of Error Details", example = """
         data: {
-          "lastName": "Last name is mandatory",
+          "last_name": "Last name is mandatory",
           "password": "Password cannot be blank",
           "phone": "Please enter a valid (+84) phone number"
         }""")

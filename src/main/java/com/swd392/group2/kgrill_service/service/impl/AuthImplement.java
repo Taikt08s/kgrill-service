@@ -18,6 +18,7 @@ import com.swd392.group2.kgrill_service.dto.AuthenticationResponse;
 import com.swd392.group2.kgrill_service.dto.GoogleAuthenticationRequest;
 import com.swd392.group2.kgrill_service.dto.RegistrationRequest;
 import com.swd392.group2.kgrill_service.exception.ActivationTokenException;
+import com.swd392.group2.kgrill_service.exception.RegistrationAccountExistedException;
 import com.swd392.group2.kgrill_service.service.AuthService;
 import com.swd392.group2.kgrill_service.service.EmailService;
 import com.swd392.group2.kgrill_service.service.JwtService;
@@ -65,6 +66,7 @@ public class AuthImplement implements AuthService {
     public void register(RegistrationRequest request) throws MessagingException, UnsupportedEncodingException {
         var userRole = roleRepository.findByRoleName("USER")
                 .orElseThrow(() -> new IllegalStateException("ROLE USER was not initialized"));
+        userRepository.findByEmail(request.getEmail()).orElseThrow(() -> new RegistrationAccountExistedException("Account already exists"));
         var user = User.builder()
                 .firstName(request.getFirstName())
                 .lastName(request.getLastName())
