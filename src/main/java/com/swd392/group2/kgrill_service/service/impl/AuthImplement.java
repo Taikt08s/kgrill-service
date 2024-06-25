@@ -18,6 +18,7 @@ import com.swd392.group2.kgrill_service.dto.AuthenticationResponse;
 import com.swd392.group2.kgrill_service.dto.GoogleAuthenticationRequest;
 import com.swd392.group2.kgrill_service.dto.RegistrationRequest;
 import com.swd392.group2.kgrill_service.exception.ActivationTokenException;
+import com.swd392.group2.kgrill_service.exception.RegistrationAccountExistedException;
 import com.swd392.group2.kgrill_service.service.AuthService;
 import com.swd392.group2.kgrill_service.service.EmailService;
 import com.swd392.group2.kgrill_service.service.JwtService;
@@ -65,6 +66,9 @@ public class AuthImplement implements AuthService {
     public void register(RegistrationRequest request) throws MessagingException, UnsupportedEncodingException {
         var userRole = roleRepository.findByRoleName("USER")
                 .orElseThrow(() -> new IllegalStateException("ROLE USER was not initialized"));
+        if (userRepository.findByEmail(request.getEmail()).isPresent()) {
+            throw new RegistrationAccountExistedException("Account already exists");
+        }
         var user = User.builder()
                 .firstName(request.getFirstName())
                 .lastName(request.getLastName())
@@ -140,7 +144,7 @@ public class AuthImplement implements AuthService {
         var claims = new HashMap<String, Object>();
         var user = ((User) auth.getPrincipal());
 
-        claims.put("fullName", user.fullName());
+        claims.put("full_name", user.fullName());
 
         var jwtAccessToken = jwtService.generateToken(claims, user);
         var jwtRefreshToken = jwtService.generateRefreshToken(user);
@@ -287,7 +291,7 @@ public class AuthImplement implements AuthService {
             }
         }
         var extraClaimsGoogle = new HashMap<String, Object>();
-        extraClaimsGoogle.put("fullName", user.fullName());
+        extraClaimsGoogle.put("full_name", user.fullName());
 
         String jwtAccessToken = jwtService.generateToken(extraClaimsGoogle, user);
         String jwtRefreshToken = jwtService.generateRefreshToken(user);
