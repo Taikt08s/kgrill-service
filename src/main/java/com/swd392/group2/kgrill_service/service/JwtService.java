@@ -1,6 +1,5 @@
 package com.swd392.group2.kgrill_service.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.KeyLengthException;
 import io.jsonwebtoken.Claims;
@@ -22,6 +21,6 @@ public interface JwtService {
 
     String generateEncryptedToken(Map<String, Object> claims, UserDetails userDetails) throws JOSEException;
 
-    Claims decryptJwt(String encryptedToken) throws ParseException, JOSEException, JsonProcessingException;
+    Claims decryptJwt(String encryptedToken) throws ParseException, JOSEException;
 }
 

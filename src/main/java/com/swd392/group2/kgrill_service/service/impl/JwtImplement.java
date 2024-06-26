@@ -1,7 +1,5 @@
 package com.swd392.group2.kgrill_service.service.impl;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nimbusds.jose.*;
 import com.nimbusds.jose.crypto.DirectDecrypter;
 import com.nimbusds.jose.crypto.DirectEncrypter;
@@ -77,8 +75,11 @@ public class JwtImplement implements JwtService {
                 .subject(userDetails.getUsername())
                 .issuer(jwtIssuer)
                 .audience(jwtIssuer)
+                .claim("role", populateAuthorities(userDetails.getAuthorities()))
+                .claim("type", "Bearer")
                 .expirationTime(new Date(System.currentTimeMillis() + jwtExpiration))
                 .issueTime(new Date());
+
 
         claims.forEach(claimsSetBuilder::claim);
 
@@ -142,33 +143,17 @@ public class JwtImplement implements JwtService {
     }
 
     @Override
-    public Claims decryptJwt(String encryptedToken) throws ParseException, JOSEException, JsonProcessingException {
+    public Claims decryptJwt(String encryptedToken) throws ParseException, JOSEException {
         byte[] encryptionKeyBytes = Decoders.BASE64.decode(secretKey);
         JWEObject jweObject = JWEObject.parse(encryptedToken);
         jweObject.decrypt(new DirectDecrypter(encryptionKeyBytes));
 
-//        SignedJWT signedJWT = jweObject.getPayload().toSignedJWT();
-//        if (signedJWT != null) {
-//            return Jwts.parser()
-//                    .verifyWith(getSignInKey())
-//                    .build()
-//                    .parseSignedClaims(signedJWT.serialize())
-//                    .getPayload();
-//        } else {
-//            throw new JOSEException("The JWT payload could not be decrypted or parsed.");
-//        }
-        Payload payload = jweObject.getPayload();
-        if (payload == null) {
-            throw new JOSEException("The JWT payload could not be decrypted or parsed.");
-        }
+        String payload = jweObject.getPayload().toString();
 
-        String payloadString = payload.toString();
-        System.out.println("Decrypted Payload: " + payloadString); // Debugging line
-
-        // Parse the payload string to extract claims
-        ObjectMapper objectMapper = new ObjectMapper();
-        Map payloadMap = objectMapper.readValue(payloadString, Map.class);
-
-        return Jwts.claims(payloadMap);
+            return Jwts.parser()
+                    .verifyWith(getSignInKey())
+                    .build()
+                    .parseSignedClaims(payload)
+                    .getPayload();
     }
 }
