@@ -105,11 +105,11 @@ public class JwtImplement implements JwtService {
         return Jwts.builder()
                 .header().add(headers).and()
                 .claims(extraClaims)
-                .subject(userDetails.getUsername())
+//                .subject(userDetails.getUsername())
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis() + jwtExpiration))
                 .claim("role", populateAuthorities(userDetails.getAuthorities()))
-                .claim("type", "Bearer")
+//                .claim("type", "Bearer")
                 .issuer(jwtIssuer)
                 .signWith(getSignInKey())
                 .compact();
