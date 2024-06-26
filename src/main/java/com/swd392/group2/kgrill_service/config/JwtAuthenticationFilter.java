@@ -47,6 +47,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         try {
             claims = jwtService.decryptJwt(jwtToken);
         } catch (Exception e) {
+            e.printStackTrace();
             filterChain.doFilter(request, response);
             return;
         }
