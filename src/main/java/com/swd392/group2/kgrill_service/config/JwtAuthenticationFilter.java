@@ -1,6 +1,7 @@
 package com.swd392.group2.kgrill_service.config;
 
 import com.swd392.group2.kgrill_service.service.JwtService;
+import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -40,7 +41,17 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             return;
         }
         jwtToken = authHeader.substring(7);
-        userEmail = jwtService.extractUsername(jwtToken);
+//        userEmail = jwtService.extractUsername(jwtToken);
+
+        Claims claims = null;
+        try {
+            claims = jwtService.decryptJwt(jwtToken);
+        } catch (Exception e) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
+        userEmail = claims.getSubject();
 
         if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             UserDetails userDetails = userDetailsService.loadUserByUsername(userEmail);

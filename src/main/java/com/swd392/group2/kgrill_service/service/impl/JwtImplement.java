@@ -1,9 +1,11 @@
 package com.swd392.group2.kgrill_service.service.impl;
 
 import com.nimbusds.jose.*;
+import com.nimbusds.jose.crypto.DirectDecrypter;
 import com.nimbusds.jose.crypto.DirectEncrypter;
 import com.nimbusds.jwt.EncryptedJWT;
 import com.nimbusds.jwt.JWTClaimsSet;
+import com.nimbusds.jwt.SignedJWT;
 import com.swd392.group2.kgrill_service.service.JwtService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -16,6 +18,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
+import java.text.ParseException;
 import java.util.*;
 import java.util.function.Function;
 
@@ -134,5 +137,23 @@ public class JwtImplement implements JwtService {
 
     private Date extractExpiration(String jwtToken) {
         return extractClaim(jwtToken, Claims::getExpiration);
+    }
+
+    @Override
+    public Claims decryptJwt(String encryptedToken) throws ParseException, JOSEException {
+        byte[] encryptionKeyBytes = Decoders.BASE64.decode(secretKey);
+        JWEObject jweObject = JWEObject.parse(encryptedToken);
+        jweObject.decrypt(new DirectDecrypter(encryptionKeyBytes));
+
+        SignedJWT signedJWT = jweObject.getPayload().toSignedJWT();
+        if (signedJWT != null) {
+            return Jwts.parser()
+                    .verifyWith(getSignInKey())
+                    .build()
+                    .parseSignedClaims(signedJWT.serialize())
+                    .getPayload();
+        } else {
+            throw new JOSEException("The JWT payload could not be decrypted or parsed.");
+        }
     }
 }
