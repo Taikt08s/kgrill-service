@@ -76,8 +76,10 @@ public class JwtImplement implements JwtService {
                 .issuer(jwtIssuer)
                 .audience(jwtIssuer)
                 .claim("role", populateAuthorities(userDetails.getAuthorities()))
+                .claim("type", "Bearer")
                 .expirationTime(new Date(System.currentTimeMillis() + jwtExpiration))
                 .issueTime(new Date());
+
 
         claims.forEach(claimsSetBuilder::claim);
 
@@ -146,7 +148,7 @@ public class JwtImplement implements JwtService {
         JWEObject jweObject = JWEObject.parse(encryptedToken);
         jweObject.decrypt(new DirectDecrypter(encryptionKeyBytes));
 
-        String payload = jweObject.getPayload().toString();
+        String payload = jweObject.getPayload().toString().trim();
 
             return Jwts.parser()
                     .verifyWith(getSignInKey())
