@@ -1,5 +1,9 @@
 package com.swd392.group2.kgrill_service.service.impl;
 
+import com.nimbusds.jose.*;
+import com.nimbusds.jose.crypto.DirectEncrypter;
+import com.nimbusds.jwt.EncryptedJWT;
+import com.nimbusds.jwt.JWTClaimsSet;
 import com.swd392.group2.kgrill_service.service.JwtService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -60,6 +64,32 @@ public class JwtImplement implements JwtService {
 
     public String generateRefreshToken(UserDetails userDetails) {
         return buildToken(new HashMap<>(), userDetails, refreshExpiration);
+    }
+
+    @Override
+    public String generateEncryptedToken(Map<String, Object> claims, UserDetails userDetails) throws JOSEException {
+        JWTClaimsSet.Builder claimsSetBuilder = new JWTClaimsSet.Builder()
+                .subject(userDetails.getUsername())
+                .issuer(jwtIssuer)
+                .audience(jwtIssuer)
+                .expirationTime(new Date(System.currentTimeMillis() + jwtExpiration))
+                .issueTime(new Date());
+
+        claims.forEach(claimsSetBuilder::claim);
+
+        JWTClaimsSet claimsSet = claimsSetBuilder.build();
+
+        JWEHeader header = new JWEHeader.Builder(JWEAlgorithm.DIR, EncryptionMethod.A256GCM)
+                .contentType("JWT")
+                .build();
+
+        EncryptedJWT encryptedJWT = new EncryptedJWT(header, claimsSet);
+
+        byte[] encryptionKeyBytes = Decoders.BASE64.decode(secretKey);
+        DirectEncrypter encrypter = new DirectEncrypter(encryptionKeyBytes);
+        encryptedJWT.encrypt(encrypter);
+
+        return encryptedJWT.serialize();
     }
 
     private String buildToken(Map<String, Object> extraClaims, UserDetails userDetails, long jwtExpiration) {
