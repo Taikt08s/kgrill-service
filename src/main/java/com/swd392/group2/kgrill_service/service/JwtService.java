@@ -2,8 +2,10 @@ package com.swd392.group2.kgrill_service.service;
 
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.KeyLengthException;
+import io.jsonwebtoken.Claims;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.text.ParseException;
 import java.util.Map;
 
 public interface JwtService {
@@ -18,5 +20,7 @@ public interface JwtService {
     String generateRefreshToken(UserDetails userDetails);
 
     String generateEncryptedToken(Map<String, Object> claims, UserDetails userDetails) throws JOSEException;
+
+    Claims decryptJwt(String encryptedToken) throws ParseException, JOSEException;
 }
 
