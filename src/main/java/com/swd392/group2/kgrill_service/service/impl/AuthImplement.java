@@ -2,6 +2,7 @@ package com.swd392.group2.kgrill_service.service.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import com.nimbusds.jose.JOSEException;
 import com.swd392.group2.kgrill_model.enums.AuthenticationProvider;
 import com.swd392.group2.kgrill_model.enums.EmailTemplateName;
 import com.swd392.group2.kgrill_model.enums.TokenType;
@@ -134,7 +135,7 @@ public class AuthImplement implements AuthService {
     }
 
     @Override
-    public AuthenticationResponse authenticate(AuthenticationRequest request) {
+    public AuthenticationResponse authenticate(AuthenticationRequest request) throws JOSEException {
         var auth = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         request.getEmail(),
@@ -146,7 +147,8 @@ public class AuthImplement implements AuthService {
 
         claims.put("full_name", user.fullName());
 
-        var jwtAccessToken = jwtService.generateToken(claims, user);
+//        var jwtAccessToken = jwtService.generateToken(claims, user);
+        var jwtAccessToken = jwtService.generateEncryptedToken(claims, user);
         var jwtRefreshToken = jwtService.generateRefreshToken(user);
 
         revokeAllUserToken(user);
