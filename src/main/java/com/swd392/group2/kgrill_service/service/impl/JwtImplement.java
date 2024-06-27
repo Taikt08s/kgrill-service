@@ -139,7 +139,7 @@ public class JwtImplement implements JwtService {
         byte[] encryptionKeyBytes = Decoders.BASE64.decode(secretKey);
         EncryptedJWT encryptedJWT = EncryptedJWT.parse(encryptedToken);
         encryptedJWT.decrypt(new DirectDecrypter(encryptionKeyBytes));
-        return encryptedJWT.serialize();
+        return encryptedJWT.getJWTClaimsSet().toString();
     }
 
 }
