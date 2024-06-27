@@ -38,22 +38,22 @@ public class JwtImplement implements JwtService {
     private String jwtIssuer;
 
     @Override
-    public String extractUsername(String jwtToken) {
+    public String extractUsername(String jwtToken) throws ParseException, JOSEException {
         return extractClaim(jwtToken, Claims::getSubject);
     }
 
-    private <T> T extractClaim(String jwtToken, Function<Claims, T> claimsResolver) {
+    private <T> T extractClaim(String jwtToken, Function<Claims, T> claimsResolver) throws ParseException, JOSEException {
         final Claims claims = extractAllClaims(jwtToken);
         return claimsResolver.apply(claims);
     }
 
-    private Claims extractAllClaims(String token) {
+    private Claims extractAllClaims(String token) throws ParseException, JOSEException {
+        String decryptedJwt = decryptJwt(token);
         return Jwts
                 .parser()
-                .unsecured()
                 .verifyWith(getSignInKey())
                 .build()
-                .parseSignedClaims(token)
+                .parseSignedClaims(decryptedJwt)
                 .getPayload();
     }
 
@@ -121,17 +121,17 @@ public class JwtImplement implements JwtService {
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
-    public boolean isTokenValid(String token, UserDetails userDetails) {
+    public boolean isTokenValid(String token, UserDetails userDetails) throws ParseException, JOSEException {
         final String username = extractUsername(token);
         return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
 
     }
 
-    private boolean isTokenExpired(String jwtToken) {
+    private boolean isTokenExpired(String jwtToken) throws ParseException, JOSEException {
         return extractExpiration(jwtToken).before(new Date());
     }
 
-    private Date extractExpiration(String jwtToken) {
+    private Date extractExpiration(String jwtToken) throws ParseException, JOSEException {
         return extractClaim(jwtToken, Claims::getExpiration);
     }
 

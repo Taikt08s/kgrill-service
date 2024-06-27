@@ -9,13 +9,13 @@ import java.text.ParseException;
 import java.util.Map;
 
 public interface JwtService {
-    String extractUsername(String jwtToken);
+    String extractUsername(String jwtToken) throws ParseException, JOSEException;
 
     String generateToken(Map<String,Object> claims, UserDetails userDetails);
 
     String generateToken(UserDetails userDetails);
 
-    boolean isTokenValid(String token, UserDetails userDetails);
+    boolean isTokenValid(String token, UserDetails userDetails) throws ParseException, JOSEException;
 
     String generateRefreshToken(UserDetails userDetails);
 
