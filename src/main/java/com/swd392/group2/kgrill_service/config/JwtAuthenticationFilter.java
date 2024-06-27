@@ -48,10 +48,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             decryptedJwtToken = this.jwtService.decryptJwt(jwtToken);
             userEmail = this.jwtService.extractUsername(decryptedJwtToken);
 
-
             if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                 UserDetails userDetails = userDetailsService.loadUserByUsername(userEmail);
-                try {
+
                     if (jwtService.isTokenValid(decryptedJwtToken, userDetails)) {
                         UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                                 userDetails,
@@ -63,9 +62,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                         );
                         SecurityContextHolder.getContext().setAuthentication(authToken);
                     }
-                } catch (ParseException | JOSEException e) {
-                    throw new ServletException("Unable to decrypt JWT token", e);
-                }
             }
         } catch (JOSEException | ParseException var10) {
             filterChain.doFilter(request, response);
