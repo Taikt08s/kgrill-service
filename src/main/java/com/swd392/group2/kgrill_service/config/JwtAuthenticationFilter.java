@@ -47,28 +47,29 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         try {
             decryptedJwtToken = this.jwtService.decryptJwt(jwtToken);
             userEmail = this.jwtService.extractUsername(decryptedJwtToken);
+
+
+            if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                UserDetails userDetails = userDetailsService.loadUserByUsername(userEmail);
+                try {
+                    if (jwtService.isTokenValid(decryptedJwtToken, userDetails)) {
+                        UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
+                                userDetails,
+                                null,
+                                userDetails.getAuthorities()
+                        );
+                        authToken.setDetails(
+                                new WebAuthenticationDetailsSource().buildDetails(request)
+                        );
+                        SecurityContextHolder.getContext().setAuthentication(authToken);
+                    }
+                } catch (ParseException | JOSEException e) {
+                    throw new ServletException("Unable to decrypt JWT token", e);
+                }
+            }
         } catch (JOSEException | ParseException var10) {
             filterChain.doFilter(request, response);
             return;
-        }
-
-        if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            UserDetails userDetails = userDetailsService.loadUserByUsername(userEmail);
-            try {
-                if (jwtService.isTokenValid(decryptedJwtToken, userDetails)) {
-                    UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-                            userDetails,
-                            null,
-                            userDetails.getAuthorities()
-                    );
-                    authToken.setDetails(
-                            new WebAuthenticationDetailsSource().buildDetails(request)
-                    );
-                    SecurityContextHolder.getContext().setAuthentication(authToken);
-                }
-            } catch (ParseException | JOSEException e) {
-                throw new ServletException("Unable to decrypt JWT token", e);
-            }
         }
         filterChain.doFilter(request, response);
     }
