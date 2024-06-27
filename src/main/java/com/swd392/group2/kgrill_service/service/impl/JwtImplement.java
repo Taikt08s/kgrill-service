@@ -137,18 +137,22 @@ public class JwtImplement implements JwtService {
 
     @Override
     public String decryptJwt(String encryptedToken) throws ParseException, JOSEException {
-        byte[] encryptionKeyBytes = Decoders.BASE64.decode(secretKey);
-        EncryptedJWT encryptedJWT = EncryptedJWT.parse(encryptedToken);
-        encryptedJWT.decrypt(new DirectDecrypter(encryptionKeyBytes));
+        try {
+            byte[] encryptionKeyBytes = Decoders.BASE64.decode(secretKey);
+            EncryptedJWT encryptedJWT = EncryptedJWT.parse(encryptedToken);
+            encryptedJWT.decrypt(new DirectDecrypter(encryptionKeyBytes));
 
-        // Extract the JWTClaimsSet from the decrypted payload
-        JWTClaimsSet claimsSet = encryptedJWT.getJWTClaimsSet();
+            // Extract the JWTClaimsSet from the decrypted payload
+            JWTClaimsSet claimsSet = encryptedJWT.getJWTClaimsSet();
 
-        // Convert the claims set back to a JWT string
-
-        return Jwts.builder()
-                .claims(claimsSet.getClaims())
-                .compact();
+            // Convert the claims set back to a JWT string
+            return Jwts.builder()
+                    .claims(claimsSet.getClaims())
+                    .compact();
+        } catch (ParseException | JOSEException e) {
+            // Handle the exception or throw a custom exception
+            throw new RuntimeException("Error decrypting JWT token", e);
+        }
     }
 
 }
