@@ -10,7 +10,7 @@ import java.util.Map;
 public interface JwtService {
     String extractUsername(String jwtToken);
 
-    String generateToken(Map<String,Object> claims, UserDetails userDetails);
+    String generateToken(Map<String, Object> claims, UserDetails userDetails);
 
     String generateToken(UserDetails userDetails);
 

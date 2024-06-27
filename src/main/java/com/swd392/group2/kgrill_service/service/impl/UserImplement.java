@@ -27,7 +27,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.text.ParseException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -42,23 +41,6 @@ public class UserImplement implements UserService {
 
     @Override
     public ResponseEntity<Object> getUserInformation(HttpServletRequest request) {
-//        String token = extractTokenFromHeader(request);
-//        if (token == null) {
-//            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("No JWT token found in the request header");
-//        }
-//
-//        final Token accessToken = tokenRepository.findByAccessToken(token).orElse(null);
-//        if (accessToken == null) {
-//            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid JWT token");
-//        }
-//
-//        String username = jwtService.extractUsername(token);
-//        var user = userRepository.findByEmail(username).orElse(null);
-//        if (user == null || !jwtService.isTokenValid(token, user) || accessToken.isRevoked() || accessToken.isExpired()) {
-//            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("JWT token has expired and revoked");
-//        }
-//
-//        return CustomSuccessHandler.responseBuilder(HttpStatus.OK, "Successfully retrieved user information", user);
         String token = extractTokenFromHeader(request);
         if (token == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("No JWT token found in the request header");
