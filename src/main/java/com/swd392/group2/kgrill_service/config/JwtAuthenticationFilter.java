@@ -1,5 +1,6 @@
 package com.swd392.group2.kgrill_service.config;
 
+import com.nimbusds.jose.JOSEException;
 import com.swd392.group2.kgrill_service.service.JwtService;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
@@ -18,6 +19,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.text.ParseException;
 
 @Component
 @RequiredArgsConstructor
@@ -43,16 +45,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         jwtToken = authHeader.substring(7).trim();
 //        userEmail = jwtService.extractUsername(jwtToken);
 
-        Claims claims = null;
         try {
-            claims = jwtService.decryptJwt(jwtToken);
-        } catch (Exception e) {
-            e.printStackTrace();
+            userEmail = jwtService.decryptJwt(jwtToken);
+        } catch (ParseException | JOSEException e) {
             filterChain.doFilter(request, response);
             return;
         }
-
-        userEmail = claims.getSubject();
 
         if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             UserDetails userDetails = userDetailsService.loadUserByUsername(userEmail);
