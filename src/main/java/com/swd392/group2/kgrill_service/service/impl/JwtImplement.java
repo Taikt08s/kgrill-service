@@ -144,6 +144,9 @@ public class JwtImplement implements JwtService {
     @Override
     public String decryptJwt(String encryptedToken) throws ParseException, JOSEException {
         byte[] encryptionKeyBytes = Decoders.BASE64.decode(secretKey);
+        if (encryptionKeyBytes.length != 32) {
+            throw new IllegalArgumentException("Invalid key length: " + encryptionKeyBytes.length);
+        }
         EncryptedJWT encryptedJWT = EncryptedJWT.parse(encryptedToken);
         encryptedJWT.decrypt(new DirectDecrypter(encryptionKeyBytes));
         JWTClaimsSet claimsSet = encryptedJWT.getJWTClaimsSet();
