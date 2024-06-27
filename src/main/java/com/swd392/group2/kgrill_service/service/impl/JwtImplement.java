@@ -38,13 +38,26 @@ public class JwtImplement implements JwtService {
     private String jwtIssuer;
 
     @Override
-    public String extractUsername(String jwtToken) throws ParseException, JOSEException {
-        return extractClaim(jwtToken, Claims::getSubject);
+    public String extractUsername(String jwtToken) {
+//        return extractClaim(jwtToken, Claims::getSubject);
+        try {
+            return extractClaim(jwtToken, Claims::getSubject);
+        } catch (ParseException | JOSEException e) {
+            // Handle the exception or rethrow a custom exception
+            throw new RuntimeException("Error extracting username from JWT token", e);
+        }
     }
 
     private <T> T extractClaim(String jwtToken, Function<Claims, T> claimsResolver) throws ParseException, JOSEException {
-        final Claims claims = extractAllClaims(jwtToken);
-        return claimsResolver.apply(claims);
+//        final Claims claims = extractAllClaims(jwtToken);
+//        return claimsResolver.apply(claims);
+        try {
+            final Claims claims = extractAllClaims(jwtToken);
+            return claimsResolver.apply(claims);
+        } catch (ParseException | JOSEException e) {
+            // Handle the exception or rethrow a custom exception
+            throw new RuntimeException("Error extracting claim from JWT token", e);
+        }
     }
 
     private Claims extractAllClaims(String token) throws ParseException, JOSEException {
