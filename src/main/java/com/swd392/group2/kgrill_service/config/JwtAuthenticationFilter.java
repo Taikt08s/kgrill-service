@@ -66,8 +66,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     );
                     SecurityContextHolder.getContext().setAuthentication(authToken);
                 }
-            } catch (ParseException | JOSEException ignored) {
-
+            } catch (ParseException | JOSEException e) {
+                throw new ServletException("Unable to decrypt JWT token", e);
             }
         }
         filterChain.doFilter(request, response);
