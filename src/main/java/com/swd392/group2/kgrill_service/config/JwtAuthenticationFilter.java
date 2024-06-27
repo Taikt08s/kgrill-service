@@ -2,7 +2,6 @@ package com.swd392.group2.kgrill_service.config;
 
 import com.nimbusds.jose.JOSEException;
 import com.swd392.group2.kgrill_service.service.JwtService;
-import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -67,8 +66,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     );
                     SecurityContextHolder.getContext().setAuthentication(authToken);
                 }
-            } catch (ParseException | JOSEException e) {
-                throw new RuntimeException(e);
+            } catch (ParseException | JOSEException ignored) {
+
             }
         }
         filterChain.doFilter(request, response);
