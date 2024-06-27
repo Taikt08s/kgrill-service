@@ -147,7 +147,6 @@ public class AuthImplement implements AuthService {
 
         claims.put("full_name", user.fullName());
 
-//        var jwtAccessToken = jwtService.generateToken(claims, user);
         var jwtAccessToken = jwtService.generateEncryptedToken(claims, user);
         var jwtRefreshToken = jwtService.generateRefreshToken(user);
 
