@@ -50,6 +50,7 @@ public class JwtImplement implements JwtService {
     private Claims extractAllClaims(String token) {
         return Jwts
                 .parser()
+                .unsecured()
                 .verifyWith(getSignInKey())
                 .build()
                 .parseSignedClaims(token)
