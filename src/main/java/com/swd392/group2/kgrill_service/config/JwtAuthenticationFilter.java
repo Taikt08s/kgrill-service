@@ -44,19 +44,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             return;
         }
         jwtToken = authHeader.substring(7);
-//        userEmail = jwtService.extractUsername(jwtToken);
-
-//        try {
-//            userEmail = jwtService.decryptJwt(jwtToken);
-//        } catch (ParseException | JOSEException e) {
-//            filterChain.doFilter(request, response);
-//            return;
-//        }
 
         try {
-            decryptedJwtToken = jwtService.decryptJwt(jwtToken);
-            userEmail = jwtService.extractUsername(decryptedJwtToken);  // Extract the username from the decrypted token
-        } catch (ParseException | JOSEException e) {
+            decryptedJwtToken = this.jwtService.decryptJwt(jwtToken);
+            userEmail = this.jwtService.extractUsername(decryptedJwtToken);
+        } catch (JOSEException | ParseException var10) {
             filterChain.doFilter(request, response);
             return;
         }

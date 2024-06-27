@@ -78,22 +78,15 @@ public class JwtImplement implements JwtService {
                 .claim("type", "Bearer")
                 .expirationTime(new Date(System.currentTimeMillis() + jwtExpiration))
                 .issueTime(new Date());
-
-
         claims.forEach(claimsSetBuilder::claim);
-
         JWTClaimsSet claimsSet = claimsSetBuilder.build();
-
         JWEHeader header = new JWEHeader.Builder(JWEAlgorithm.DIR, EncryptionMethod.A256GCM)
                 .contentType("JWT")
                 .build();
-
         EncryptedJWT encryptedJWT = new EncryptedJWT(header, claimsSet);
-
         byte[] encryptionKeyBytes = Decoders.BASE64.decode(secretKey);
         DirectEncrypter encrypter = new DirectEncrypter(encryptionKeyBytes);
         encryptedJWT.encrypt(encrypter);
-
         return encryptedJWT.serialize();
     }
 
@@ -144,13 +137,6 @@ public class JwtImplement implements JwtService {
     @Override
     public String decryptJwt(String encryptedToken) throws ParseException, JOSEException {
         byte[] encryptionKeyBytes = Decoders.BASE64.decode(secretKey);
-        if (encryptionKeyBytes.length != 32) {
-            throw new IllegalArgumentException("Invalid key length: " + encryptionKeyBytes.length);
-        }
-//        EncryptedJWT encryptedJWT = EncryptedJWT.parse(encryptedToken);
-//        encryptedJWT.decrypt(new DirectDecrypter(encryptionKeyBytes));
-//        JWTClaimsSet claimsSet = encryptedJWT.getJWTClaimsSet();
-//        return claimsSet.getSubject();
         EncryptedJWT encryptedJWT = EncryptedJWT.parse(encryptedToken);
         encryptedJWT.decrypt(new DirectDecrypter(encryptionKeyBytes));
         return encryptedJWT.serialize();
