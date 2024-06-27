@@ -1,6 +1,7 @@
 package com.swd392.group2.kgrill_service.service.impl;
 
 
+import com.nimbusds.jose.JOSEException;
 import com.swd392.group2.kgrill_model.model.Token;
 import com.swd392.group2.kgrill_model.model.User;
 
@@ -24,7 +25,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
+import java.text.ParseException;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -38,7 +39,7 @@ public class UserImplement implements UserService {
     private final ModelMapper modelMapper;
 
     @Override
-    public ResponseEntity<Object> getUserInformation(HttpServletRequest request) {
+    public ResponseEntity<Object> getUserInformation(HttpServletRequest request) throws ParseException, JOSEException {
         String token = extractTokenFromHeader(request);
         if (token == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("No JWT token found in the request header");
