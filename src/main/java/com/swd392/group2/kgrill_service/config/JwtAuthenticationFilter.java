@@ -38,15 +38,24 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         final String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
         final String jwtToken;
         final String userEmail;
+        final String decryptedJwtToken;
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);
             return;
         }
-        jwtToken = authHeader.substring(7).trim();
+        jwtToken = authHeader.substring(7);
 //        userEmail = jwtService.extractUsername(jwtToken);
 
+//        try {
+//            userEmail = jwtService.decryptJwt(jwtToken);
+//        } catch (ParseException | JOSEException e) {
+//            filterChain.doFilter(request, response);
+//            return;
+//        }
+
         try {
-            userEmail = jwtService.decryptJwt(jwtToken);
+            decryptedJwtToken = jwtService.decryptJwt(jwtToken);
+            userEmail = jwtService.extractUsername(decryptedJwtToken);  // Extract the username from the decrypted token
         } catch (ParseException | JOSEException e) {
             filterChain.doFilter(request, response);
             return;
@@ -54,7 +63,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             UserDetails userDetails = userDetailsService.loadUserByUsername(userEmail);
-            if (jwtService.isTokenValid(jwtToken, userDetails)) {
+            if (jwtService.isTokenValid(decryptedJwtToken, userDetails)) {
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                         userDetails,
                         null,
