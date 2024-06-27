@@ -21,6 +21,6 @@ public interface JwtService {
 
     String generateEncryptedToken(Map<String, Object> claims, UserDetails userDetails) throws JOSEException;
 
-    Claims decryptJwt(String encryptedToken) throws ParseException, JOSEException;
+    String decryptJwt(String encryptedToken) throws ParseException, JOSEException;
 }
 
