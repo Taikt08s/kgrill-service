@@ -147,10 +147,13 @@ public class JwtImplement implements JwtService {
         if (encryptionKeyBytes.length != 32) {
             throw new IllegalArgumentException("Invalid key length: " + encryptionKeyBytes.length);
         }
+//        EncryptedJWT encryptedJWT = EncryptedJWT.parse(encryptedToken);
+//        encryptedJWT.decrypt(new DirectDecrypter(encryptionKeyBytes));
+//        JWTClaimsSet claimsSet = encryptedJWT.getJWTClaimsSet();
+//        return claimsSet.getSubject();
         EncryptedJWT encryptedJWT = EncryptedJWT.parse(encryptedToken);
         encryptedJWT.decrypt(new DirectDecrypter(encryptionKeyBytes));
-        JWTClaimsSet claimsSet = encryptedJWT.getJWTClaimsSet();
-        return claimsSet.getSubject();
+        return encryptedJWT.serialize();
     }
 
 }
