@@ -134,9 +134,14 @@ public class JwtImplement implements JwtService {
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
-    public boolean isTokenValid(String token, UserDetails userDetails) throws ParseException, JOSEException {
+    public boolean isTokenValid(String token, UserDetails userDetails) {
+        try {
         final String username = extractUsername(token);
         return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
+        } catch (ParseException | JOSEException e) {
+            // Handle the exception or rethrow a custom exception
+            throw new RuntimeException("Error extracting username from JWT token", e);
+        }
 
     }
 
@@ -144,12 +149,17 @@ public class JwtImplement implements JwtService {
         return extractExpiration(jwtToken).before(new Date());
     }
 
-    private Date extractExpiration(String jwtToken) throws ParseException, JOSEException {
+    private Date extractExpiration(String jwtToken) {
+        try {
         return extractClaim(jwtToken, Claims::getExpiration);
+        } catch (ParseException | JOSEException e) {
+            // Handle the exception or rethrow a custom exception
+            throw new RuntimeException("Error extracting username from JWT token", e);
+        }
     }
 
     @Override
-    public String decryptJwt(String encryptedToken) throws JOSEException {
+    public String decryptJwt(String encryptedToken) {
         try {
             byte[] encryptionKeyBytes = Decoders.BASE64.decode(secretKey);
             EncryptedJWT encryptedJWT = EncryptedJWT.parse(encryptedToken);
