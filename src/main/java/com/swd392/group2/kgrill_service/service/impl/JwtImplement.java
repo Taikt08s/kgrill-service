@@ -144,7 +144,11 @@ public class JwtImplement implements JwtService {
 
     public boolean isEncryptedTokenValid(JWTClaimsSet claims, UserDetails userDetails) {
         final String username = claims.getSubject();
-        return (username.equals(userDetails.getUsername()) && !isTokenExpired(String.valueOf(claims)));
+        return (username.equals(userDetails.getUsername()) && !isEncryptedTokenExpired(claims));
     }
 
+    private boolean isEncryptedTokenExpired(JWTClaimsSet claims) {
+        Date expirationTime = claims.getExpirationTime();
+        return expirationTime.before(new Date());
+    }
 }
