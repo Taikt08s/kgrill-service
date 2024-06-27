@@ -149,7 +149,7 @@ public class JwtImplement implements JwtService {
     }
 
     @Override
-    public String decryptJwt(String encryptedToken) throws ParseException, JOSEException {
+    public String decryptJwt(String encryptedToken) throws JOSEException {
         try {
             byte[] encryptionKeyBytes = Decoders.BASE64.decode(secretKey);
             EncryptedJWT encryptedJWT = EncryptedJWT.parse(encryptedToken);
