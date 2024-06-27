@@ -17,7 +17,7 @@ public interface AuthService {
 
     void activateAccount(String token, HttpServletResponse response) throws MessagingException, UnsupportedEncodingException;
 
-    void refreshToken(HttpServletRequest request, HttpServletResponse response) throws IOException;
+    void refreshToken(HttpServletRequest request, HttpServletResponse response) throws IOException, JOSEException;
 
     AuthenticationResponse findOrCreateUser(GoogleAuthenticationRequest request);
 }
