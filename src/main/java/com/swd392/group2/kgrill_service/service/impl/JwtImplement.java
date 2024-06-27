@@ -139,7 +139,15 @@ public class JwtImplement implements JwtService {
         byte[] encryptionKeyBytes = Decoders.BASE64.decode(secretKey);
         EncryptedJWT encryptedJWT = EncryptedJWT.parse(encryptedToken);
         encryptedJWT.decrypt(new DirectDecrypter(encryptionKeyBytes));
-        return encryptedJWT.getJWTClaimsSet().toString();
+
+        // Extract the JWTClaimsSet from the decrypted payload
+        JWTClaimsSet claimsSet = encryptedJWT.getJWTClaimsSet();
+
+        // Convert the claims set back to a JWT string
+
+        return Jwts.builder()
+                .claims(claimsSet.getClaims())
+                .compact();
     }
 
 }
