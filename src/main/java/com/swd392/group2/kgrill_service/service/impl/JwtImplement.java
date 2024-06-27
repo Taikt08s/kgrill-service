@@ -38,22 +38,21 @@ public class JwtImplement implements JwtService {
     private String jwtIssuer;
 
     @Override
-    public String extractUsername(String jwtToken) throws ParseException, JOSEException {
+    public String extractUsername(String jwtToken) {
         return extractClaim(jwtToken, Claims::getSubject);
     }
 
-    private <T> T extractClaim(String jwtToken, Function<Claims, T> claimsResolver) throws ParseException, JOSEException {
+    private <T> T extractClaim(String jwtToken, Function<Claims, T> claimsResolver) {
         final Claims claims = extractAllClaims(jwtToken);
         return claimsResolver.apply(claims);
     }
 
-    private Claims extractAllClaims(String token) throws ParseException, JOSEException {
-        String decryptedJwt = decryptJwt(token);
+    private Claims extractAllClaims(String token) {
         return Jwts
                 .parser()
                 .verifyWith(getSignInKey())
                 .build()
-                .parseSignedClaims(decryptedJwt)
+                .parseSignedClaims(token)
                 .getPayload();
     }
 
@@ -121,36 +120,31 @@ public class JwtImplement implements JwtService {
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
-    public boolean isTokenValid(String token, UserDetails userDetails) throws ParseException, JOSEException {
-
+    public boolean isTokenValid(String token, UserDetails userDetails) {
         final String username = extractUsername(token);
         return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
+
     }
 
-    private boolean isTokenExpired(String jwtToken) throws ParseException, JOSEException {
+    private boolean isTokenExpired(String jwtToken) {
         return extractExpiration(jwtToken).before(new Date());
     }
 
-    private Date extractExpiration(String jwtToken) throws ParseException, JOSEException {
+    private Date extractExpiration(String jwtToken) {
         return extractClaim(jwtToken, Claims::getExpiration);
     }
 
     @Override
-    public String decryptJwt(String encryptedToken) throws ParseException, JOSEException {
-        String[] tokenParts = encryptedToken.split("\\.");
-        if (tokenParts.length != 5) {
-            throw new ParseException("Unexpected number of Base64URL parts, must be five", 0);
-        }
-
+    public JWTClaimsSet decryptJwt(String encryptedToken) throws ParseException, JOSEException {
         byte[] encryptionKeyBytes = Decoders.BASE64.decode(secretKey);
         EncryptedJWT encryptedJWT = EncryptedJWT.parse(encryptedToken);
         encryptedJWT.decrypt(new DirectDecrypter(encryptionKeyBytes));
-        JWTClaimsSet claimsSet = encryptedJWT.getJWTClaimsSet();
+        return encryptedJWT.getJWTClaimsSet();
+    }
 
-        return Jwts.builder()
-                .claims(claimsSet.getClaims())
-                .compact();
-
+    public boolean isEncryptedTokenValid(JWTClaimsSet claims, UserDetails userDetails) {
+        final String username = claims.getSubject();
+        return (username.equals(userDetails.getUsername()) && !isTokenExpired(String.valueOf(claims)));
     }
 
 }

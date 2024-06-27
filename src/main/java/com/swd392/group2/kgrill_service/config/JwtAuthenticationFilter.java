@@ -1,7 +1,9 @@
 package com.swd392.group2.kgrill_service.config;
 
 import com.nimbusds.jose.JOSEException;
+import com.nimbusds.jwt.JWTClaimsSet;
 import com.swd392.group2.kgrill_service.service.JwtService;
+import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -36,6 +38,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
         final String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
         final String jwtToken;
+        final String userEmail;
+        final JWTClaimsSet decryptedClaims;
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);
             return;
@@ -43,28 +47,28 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         jwtToken = authHeader.substring(7);
 
         try {
-            String decryptedJwtToken = this.jwtService.decryptJwt(jwtToken);
-            String userEmail = this.jwtService.extractUsername(decryptedJwtToken);
-
-            if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-                UserDetails userDetails = userDetailsService.loadUserByUsername(userEmail);
-                if (jwtService.isTokenValid(decryptedJwtToken, userDetails)) {
-                    UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-                            userDetails,
-                            null,
-                            userDetails.getAuthorities()
-                    );
-                    authToken.setDetails(
-                            new WebAuthenticationDetailsSource().buildDetails(request)
-                    );
-                    SecurityContextHolder.getContext().setAuthentication(authToken);
-                }
-            }
-        } catch (JOSEException | ParseException e) {
-            logger.error("JWT processing error: {}", e);
-            throw new ServletException("Unable to decrypt or validate JWT token", e);
+            decryptedClaims = this.jwtService.decryptJwt(jwtToken);
+            userEmail = decryptedClaims.getSubject();
+        } catch (JOSEException | ParseException var10) {
+            filterChain.doFilter(request, response);
+            return;
         }
 
+
+        if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+            UserDetails userDetails = userDetailsService.loadUserByUsername(userEmail);
+            if (jwtService.isEncryptedTokenValid(decryptedClaims, userDetails)) {
+                UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
+                        userDetails,
+                        null,
+                        userDetails.getAuthorities()
+                );
+                authToken.setDetails(
+                        new WebAuthenticationDetailsSource().buildDetails(request)
+                );
+                SecurityContextHolder.getContext().setAuthentication(authToken);
+            }
+        }
         filterChain.doFilter(request, response);
     }
 }
