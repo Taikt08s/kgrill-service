@@ -9,6 +9,7 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.text.ParseException;
 
 public interface AuthService {
     void register(RegistrationRequest request) throws MessagingException, UnsupportedEncodingException;
@@ -17,7 +18,7 @@ public interface AuthService {
 
     void activateAccount(String token, HttpServletResponse response) throws MessagingException, UnsupportedEncodingException;
 
-    void refreshToken(HttpServletRequest request, HttpServletResponse response) throws IOException;
+    void refreshToken(HttpServletRequest request, HttpServletResponse response) throws IOException, ParseException, JOSEException;
 
     AuthenticationResponse findOrCreateUser(GoogleAuthenticationRequest request);
 }
