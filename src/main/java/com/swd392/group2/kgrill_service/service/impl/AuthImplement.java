@@ -42,7 +42,6 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.security.SecureRandom;
-import java.text.ParseException;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 
@@ -213,7 +212,7 @@ public class AuthImplement implements AuthService {
     }
 
     @Override
-    public void refreshToken(HttpServletRequest request, HttpServletResponse response) throws IOException, ParseException, JOSEException {
+    public void refreshToken(HttpServletRequest request, HttpServletResponse response) throws IOException {
         final String authHeader = checkInputToken(request, response);
         if (authHeader == null) return;
         final String refreshedToken;
