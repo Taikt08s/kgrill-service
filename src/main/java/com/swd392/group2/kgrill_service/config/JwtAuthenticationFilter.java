@@ -48,24 +48,21 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
             if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                 UserDetails userDetails = userDetailsService.loadUserByUsername(userEmail);
-                try {
-                    if (jwtService.isTokenValid(decryptedJwtToken, userDetails)) {
-                        UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-                                userDetails,
-                                null,
-                                userDetails.getAuthorities()
-                        );
-                        authToken.setDetails(
-                                new WebAuthenticationDetailsSource().buildDetails(request)
-                        );
-                        SecurityContextHolder.getContext().setAuthentication(authToken);
-                    }
-                } catch (JOSEException | ParseException e) {
-                    throw new ServletException("Unable to validate JWT token", e);
+                if (jwtService.isTokenValid(decryptedJwtToken, userDetails)) {
+                    UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
+                            userDetails,
+                            null,
+                            userDetails.getAuthorities()
+                    );
+                    authToken.setDetails(
+                            new WebAuthenticationDetailsSource().buildDetails(request)
+                    );
+                    SecurityContextHolder.getContext().setAuthentication(authToken);
                 }
             }
         } catch (JOSEException | ParseException e) {
-            throw new ServletException("Unable to decrypt JWT token", e);
+            logger.error("JWT processing error: {}", e);
+            throw new ServletException("Unable to decrypt or validate JWT token", e);
         }
 
         filterChain.doFilter(request, response);
