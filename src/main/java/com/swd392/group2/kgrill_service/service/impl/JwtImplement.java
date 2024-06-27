@@ -38,24 +38,16 @@ public class JwtImplement implements JwtService {
     private String jwtIssuer;
 
     @Override
-    public String extractUsername(String jwtToken) {
-//        return extractClaim(jwtToken, Claims::getSubject);
-        try {
-            return extractClaim(jwtToken, Claims::getSubject);
-        } catch (ParseException | JOSEException e) {
-            // Handle the exception or rethrow a custom exception
-            throw new RuntimeException("Error extracting username from JWT token", e);
-        }
+    public String extractUsername(String jwtToken) throws ParseException, JOSEException {
+        return extractClaim(jwtToken, Claims::getSubject);
     }
 
     private <T> T extractClaim(String jwtToken, Function<Claims, T> claimsResolver) throws ParseException, JOSEException {
-//        final Claims claims = extractAllClaims(jwtToken);
-//        return claimsResolver.apply(claims);
         final Claims claims = extractAllClaims(jwtToken);
         return claimsResolver.apply(claims);
     }
 
-    private Claims extractAllClaims(String token){
+    private Claims extractAllClaims(String token) throws ParseException, JOSEException {
         String decryptedJwt = decryptJwt(token);
         return Jwts
                 .parser()
@@ -129,48 +121,32 @@ public class JwtImplement implements JwtService {
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
-    public boolean isTokenValid(String token, UserDetails userDetails) {
-        try {
+    public boolean isTokenValid(String token, UserDetails userDetails) throws ParseException, JOSEException {
+
         final String username = extractUsername(token);
         return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
-        } catch (ParseException | JOSEException e) {
-            // Handle the exception or rethrow a custom exception
-            throw new RuntimeException("Error extracting username from JWT token", e);
-        }
-
     }
 
     private boolean isTokenExpired(String jwtToken) throws ParseException, JOSEException {
         return extractExpiration(jwtToken).before(new Date());
     }
 
-    private Date extractExpiration(String jwtToken) {
-        try {
+    private Date extractExpiration(String jwtToken) throws ParseException, JOSEException {
         return extractClaim(jwtToken, Claims::getExpiration);
-        } catch (ParseException | JOSEException e) {
-            // Handle the exception or rethrow a custom exception
-            throw new RuntimeException("Error extracting username from JWT token", e);
-        }
     }
 
     @Override
-    public String decryptJwt(String encryptedToken) {
-        try {
+    public String decryptJwt(String encryptedToken) throws ParseException, JOSEException {
+
             byte[] encryptionKeyBytes = Decoders.BASE64.decode(secretKey);
             EncryptedJWT encryptedJWT = EncryptedJWT.parse(encryptedToken);
             encryptedJWT.decrypt(new DirectDecrypter(encryptionKeyBytes));
-
-            // Extract the JWTClaimsSet from the decrypted payload
             JWTClaimsSet claimsSet = encryptedJWT.getJWTClaimsSet();
 
-            // Convert the claims set back to a JWT string
             return Jwts.builder()
                     .claims(claimsSet.getClaims())
                     .compact();
-        } catch (ParseException | JOSEException e) {
-            // Handle the exception or throw a custom exception
-            throw new RuntimeException("Error decrypting JWT token", e);
-        }
+
     }
 
 }
