@@ -137,15 +137,19 @@ public class JwtImplement implements JwtService {
 
     @Override
     public String decryptJwt(String encryptedToken) throws ParseException, JOSEException {
+        String[] tokenParts = encryptedToken.split("\\.");
+        if (tokenParts.length != 5) {
+            throw new ParseException("Unexpected number of Base64URL parts, must be five", 0);
+        }
 
-            byte[] encryptionKeyBytes = Decoders.BASE64.decode(secretKey);
-            EncryptedJWT encryptedJWT = EncryptedJWT.parse(encryptedToken);
-            encryptedJWT.decrypt(new DirectDecrypter(encryptionKeyBytes));
-            JWTClaimsSet claimsSet = encryptedJWT.getJWTClaimsSet();
+        byte[] encryptionKeyBytes = Decoders.BASE64.decode(secretKey);
+        EncryptedJWT encryptedJWT = EncryptedJWT.parse(encryptedToken);
+        encryptedJWT.decrypt(new DirectDecrypter(encryptionKeyBytes));
+        JWTClaimsSet claimsSet = encryptedJWT.getJWTClaimsSet();
 
-            return Jwts.builder()
-                    .claims(claimsSet.getClaims())
-                    .compact();
+        return Jwts.builder()
+                .claims(claimsSet.getClaims())
+                .compact();
 
     }
 
