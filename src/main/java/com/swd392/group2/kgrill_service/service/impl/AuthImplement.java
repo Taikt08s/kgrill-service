@@ -2,6 +2,7 @@ package com.swd392.group2.kgrill_service.service.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import com.nimbusds.jose.JOSEException;
 import com.swd392.group2.kgrill_model.enums.AuthenticationProvider;
 import com.swd392.group2.kgrill_model.enums.EmailTemplateName;
 import com.swd392.group2.kgrill_model.enums.TokenType;
@@ -18,6 +19,7 @@ import com.swd392.group2.kgrill_service.dto.AuthenticationResponse;
 import com.swd392.group2.kgrill_service.dto.GoogleAuthenticationRequest;
 import com.swd392.group2.kgrill_service.dto.RegistrationRequest;
 import com.swd392.group2.kgrill_service.exception.ActivationTokenException;
+import com.swd392.group2.kgrill_service.exception.RefreshTokenNotFoundException;
 import com.swd392.group2.kgrill_service.exception.RegistrationAccountExistedException;
 import com.swd392.group2.kgrill_service.service.AuthService;
 import com.swd392.group2.kgrill_service.service.EmailService;
@@ -134,7 +136,7 @@ public class AuthImplement implements AuthService {
     }
 
     @Override
-    public AuthenticationResponse authenticate(AuthenticationRequest request) {
+    public AuthenticationResponse authenticate(AuthenticationRequest request) throws JOSEException {
         var auth = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         request.getEmail(),
@@ -146,7 +148,7 @@ public class AuthImplement implements AuthService {
 
         claims.put("full_name", user.fullName());
 
-        var jwtAccessToken = jwtService.generateToken(claims, user);
+        var jwtAccessToken = jwtService.generateEncryptedToken(claims, user);
         var jwtRefreshToken = jwtService.generateRefreshToken(user);
 
         revokeAllUserToken(user);
@@ -210,7 +212,7 @@ public class AuthImplement implements AuthService {
     }
 
     @Override
-    public void refreshToken(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public void refreshToken(HttpServletRequest request, HttpServletResponse response) throws IOException, JOSEException {
         final String authHeader = checkInputToken(request, response);
         if (authHeader == null) return;
         final String refreshedToken;
@@ -218,14 +220,15 @@ public class AuthImplement implements AuthService {
         refreshedToken = authHeader.substring(7);
         username = jwtService.extractUsername(refreshedToken);
 
-        final Token currentRefreshedToken = tokenRepository.findByRefreshTokenAndRevokedFalseAndExpiredFalse(refreshedToken).get();
+        final Token currentRefreshedToken = tokenRepository.findByRefreshTokenAndRevokedFalseAndExpiredFalse(refreshedToken).orElseThrow(()
+                -> new RefreshTokenNotFoundException("Token not found or is invalid"));
 
         if (username != null) {
             var user = this.userRepository.findByEmail(username)
                     .orElseThrow();
             if ((jwtService.isTokenValid(refreshedToken, user))
                     && !currentRefreshedToken.isRevoked() && !currentRefreshedToken.isExpired()) {
-                var accessToken = jwtService.generateToken(user);
+                var accessToken = jwtService.generateEncryptedToken(new HashMap<>(), user);
                 var authResponse = AuthenticationResponse.builder()
                         .accessToken(accessToken)
                         .refreshToken(refreshedToken)

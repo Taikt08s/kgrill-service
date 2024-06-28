@@ -10,6 +10,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.context.request.WebRequest;
 
 import java.util.*;
 
@@ -119,6 +120,14 @@ public class GlobalExceptionHandler {
                                 .error(exception.getMessage())
                                 .build()
                 );
+    }
+    @ExceptionHandler(DishNotFoundException.class)
+    public ResponseEntity<ExceptionResponse> handleDishNotFoundException(DishNotFoundException ex, WebRequest request){
+        ExceptionResponse exceptionResponse=new ExceptionResponse();
+        exceptionResponse.setHttpStatus(HttpStatus.NOT_FOUND.value());
+        exceptionResponse.setMessage(exceptionResponse.getMessage());
+        exceptionResponse.setTimestamp(DateUtil.formatTimestamp(new Date()));
+        return new ResponseEntity<ExceptionResponse>(exceptionResponse,HttpStatus.NOT_FOUND);
     }
 
 }

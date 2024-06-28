@@ -1,23 +1,35 @@
 package com.swd392.group2.kgrill_service.service.impl;
 
 
+import com.nimbusds.jose.JOSEException;
+import com.nimbusds.jwt.JWTClaimsSet;
 import com.swd392.group2.kgrill_model.model.Token;
 import com.swd392.group2.kgrill_model.model.User;
 
 import com.swd392.group2.kgrill_model.repository.TokenRepository;
 import com.swd392.group2.kgrill_model.repository.UserRepository;
+import com.swd392.group2.kgrill_service.dto.CustomUserProfile;
 import com.swd392.group2.kgrill_service.dto.UserProfileDto;
+import com.swd392.group2.kgrill_service.dto.UserProfileResponse;
 import com.swd392.group2.kgrill_service.exception.CustomSuccessHandler;
 import com.swd392.group2.kgrill_service.service.JwtService;
 import com.swd392.group2.kgrill_service.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.text.ParseException;
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -25,6 +37,7 @@ public class UserImplement implements UserService {
     private final JwtService jwtService;
     private final TokenRepository tokenRepository;
     private final UserRepository userRepository;
+    private final ModelMapper modelMapper;
 
     @Override
     public ResponseEntity<Object> getUserInformation(HttpServletRequest request) {
@@ -38,13 +51,39 @@ public class UserImplement implements UserService {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid JWT token");
         }
 
-        String username = jwtService.extractUsername(token);
+        JWTClaimsSet decryptedClaims;
+        try {
+            decryptedClaims = jwtService.decryptJwt(token);
+        } catch (JOSEException | ParseException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Failed to decrypt JWT token");
+        }
+
+        String username = decryptedClaims.getSubject();
         var user = userRepository.findByEmail(username).orElse(null);
-        if (user == null || !jwtService.isTokenValid(token, user) || accessToken.isRevoked() || accessToken.isExpired()) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("JWT token has expired and revoked");
+        if (user == null || !jwtService.isEncryptedTokenValid(decryptedClaims, user) || accessToken.isRevoked() || accessToken.isExpired()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("JWT token has expired or been revoked");
         }
 
         return CustomSuccessHandler.responseBuilder(HttpStatus.OK, "Successfully retrieved user information", user);
+    }
+
+    @Override
+    public UserProfileResponse getAllUsers(int pageNo, int pageSize, String sortBy, String sortDir, String email) {
+        Sort sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
+        Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
+
+        Page<User> UserContent = userRepository.findByEmail(email, pageable);
+        List<User> UserList = UserContent.getContent();
+        List<CustomUserProfile> content = UserList.stream().map(UserProfile -> modelMapper.map(UserProfile, CustomUserProfile.class)).collect(Collectors.toList());
+
+        UserProfileResponse userProfileResponse = new UserProfileResponse();
+        userProfileResponse.setContent(content);
+        userProfileResponse.setPageNo(UserContent.getNumber());
+        userProfileResponse.setPageSize(UserContent.getSize());
+        userProfileResponse.setTotalElements(UserContent.getTotalElements());
+        userProfileResponse.setTotalPages(UserContent.getTotalPages());
+        userProfileResponse.setLast(UserContent.isLast());
+        return userProfileResponse;
     }
 
     public String extractTokenFromHeader(HttpServletRequest request) {

@@ -1,6 +1,7 @@
 package com.swd392.group2.kgrill_service.service.impl;
 
 
+import com.swd392.group2.kgrill_model.model.Dish;
 import com.swd392.group2.kgrill_model.model.Ingredient;
 import com.swd392.group2.kgrill_model.repository.IngredientRepository;
 import com.swd392.group2.kgrill_service.dto.IngredientDTO;
@@ -8,6 +9,9 @@ import com.swd392.group2.kgrill_service.exception.IngredientNotFoundException;
 import com.swd392.group2.kgrill_service.service.IngredientService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class IngredientImplement implements IngredientService {
@@ -28,6 +32,12 @@ private IngredientRepository ingredientRepository;
         ingredientResponse.setId(newIn.getId());
         ingredientResponse.setName(newIn.getName());
         return ingredientResponse;
+    }
+
+    @Override
+    public List<IngredientDTO> getAllIngredient() {
+        List<Ingredient> ins = ingredientRepository.findAll();
+        return ins.stream().map(d -> mapToDto(d)).collect(Collectors.toList());
     }
 
     @Override

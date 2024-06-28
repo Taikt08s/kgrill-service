@@ -38,11 +38,11 @@ public class DishImplement implements DishService {
         return dishResponse;
     }
 
-//    @Override
-//    public List<DishDTO> getAllDish() {
-//        List<Dish> dishes = dishRepository.findAll();
-//        return dishes.stream().map(d -> mapToDto(d)).collect(Collectors.toList());
-//    }
+    @Override
+    public List<DishDTO> getAllDish() {
+        List<Dish> dishes = dishRepository.findAll();
+        return dishes.stream().map(d -> mapToDto(d)).collect(Collectors.toList());
+    }
 
     @Override
     public DishDTO getDishByID(int id) {
