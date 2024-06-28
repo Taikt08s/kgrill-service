@@ -77,6 +77,22 @@ public class UserImplement implements UserService {
         return userProfileResponse;
     }
 
+    @Override
+    public ResponseEntity<Object> updateUserProfileByAdmin(UUID id, CustomUserProfile customUserProfile) {
+        User user = userRepository.findById(id).orElse(null);
+        if (user != null) {
+            user.setFirstName(customUserProfile.getFirstName());
+            user.setLastName(customUserProfile.getLastName());
+            user.setAddress(customUserProfile.getAddress());
+            user.setEmail(customUserProfile.getEmail());
+            user.setAccountNotLocked(customUserProfile.isAccountNotLocked());
+            User updateUser = userRepository.save(user);
+            return CustomSuccessHandler.responseBuilder(HttpStatus.OK, "user profile update successfully",updateUser );
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Update failed");
+        }
+    }
+
     public String extractTokenFromHeader(HttpServletRequest request) {
         String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
         if (authHeader != null && authHeader.startsWith("Bearer ")) {

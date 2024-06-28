@@ -38,11 +38,9 @@ public class UserProfileDto {
     private String address;
 
     @Schema(description = "Latitude of the address", example = "21.123456")
-    @NotBlank(message = "Latitude cannot be blank")
     private Double latitude;
 
     @Schema(description = "Longitude of the address", example = "105.123456")
-    @NotBlank(message = "Longitude cannot be blank")
     private Double longitude;
 
     @Schema(description = "User's gender", example = "Male")
