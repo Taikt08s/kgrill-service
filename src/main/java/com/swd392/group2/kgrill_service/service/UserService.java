@@ -1,5 +1,6 @@
 package com.swd392.group2.kgrill_service.service;
 
+import com.swd392.group2.kgrill_service.dto.CustomUserProfile;
 import com.swd392.group2.kgrill_service.dto.UserProfileResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.ResponseEntity;
@@ -11,6 +12,8 @@ public interface UserService {
     ResponseEntity<Object> getUserInformation(HttpServletRequest request);
 
     UserProfileResponse getAllUsers(int pageNo, int pageSize, String sortBy, String sortDir, String email);
+
+    ResponseEntity<Object> updateUserProfileByAdmin(UUID id, CustomUserProfile customUserProfile);
 
     UserProfileDto updateUserInformation(UUID id, UserProfileDto userProfileDto);
 

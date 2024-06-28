@@ -29,6 +29,10 @@ public class CustomUserProfile {
     @JsonProperty("last_name")
     private String lastName;
 
+    @Schema(description = "User's email", example = "tinhvv02012003@gmail.com")
+    @NotBlank(message = "Email cannot be blank")
+    private String email;
+
     @Schema(description = "User's address", example = "123 Main St, Springfield")
     @NotBlank(message = "Address cannot be blank")
     private String address;
