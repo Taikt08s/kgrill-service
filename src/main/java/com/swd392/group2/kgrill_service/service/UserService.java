@@ -12,7 +12,9 @@ public interface UserService {
     ResponseEntity<Object> getUserInformation(HttpServletRequest request);
 
     UserProfileResponse getAllUsers(int pageNo, int pageSize, String sortBy, String sortDir, String email);
+
     ResponseEntity<Object> updateUserProfileByAdmin(UUID id, CustomUserProfile customUserProfile);
+
     UserProfileDto updateUserInformation(UUID id, UserProfileDto userProfileDto);
 
     void updateUserProfilePicture(UUID id, String profilePictureUrl);

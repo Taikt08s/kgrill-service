@@ -1,5 +1,7 @@
 package com.swd392.group2.kgrill_service.service;
 
+import com.nimbusds.jose.JOSEException;
+import com.nimbusds.jose.KeyLengthException;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Map;
@@ -14,4 +16,7 @@ public interface JwtService {
     boolean isTokenValid(String token, UserDetails userDetails);
 
     String generateRefreshToken(UserDetails userDetails);
+
+    String generateEncryptedToken(Map<String, Object> claims, UserDetails userDetails) throws JOSEException;
 }
+
