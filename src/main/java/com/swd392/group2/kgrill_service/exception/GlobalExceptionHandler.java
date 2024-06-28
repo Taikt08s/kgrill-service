@@ -60,12 +60,12 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ExceptionResponse> handleMethodArgumentNotValidException(MethodArgumentNotValidException exp) {
-        Map<String,String> errors = new HashMap<>();
+        Map<String, String> errors = new HashMap<>();
         exp.getBindingResult().getAllErrors()
                 .forEach(error -> {
                     var fieldName = ((FieldError) error).getField();
                     var errorMessage = error.getDefaultMessage();
-                    errors.put(fieldName,errorMessage);
+                    errors.put(fieldName, errorMessage);
                 });
 
         return ResponseEntity
@@ -121,13 +121,33 @@ public class GlobalExceptionHandler {
                                 .build()
                 );
     }
+
     @ExceptionHandler(DishNotFoundException.class)
-    public ResponseEntity<ExceptionResponse> handleDishNotFoundException(DishNotFoundException ex, WebRequest request){
-        ExceptionResponse exceptionResponse=new ExceptionResponse();
-        exceptionResponse.setHttpStatus(HttpStatus.NOT_FOUND.value());
-        exceptionResponse.setMessage(exceptionResponse.getMessage());
-        exceptionResponse.setTimestamp(DateUtil.formatTimestamp(new Date()));
-        return new ResponseEntity<ExceptionResponse>(exceptionResponse,HttpStatus.NOT_FOUND);
+    public ResponseEntity<ExceptionResponse> handleDishNotFoundException(DishNotFoundException ex, WebRequest request) {
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(
+                        ExceptionResponse.builder()
+                                .httpStatus(400)
+                                .timestamp(DateUtil.formatTimestamp(new Date()))
+                                .message("Dish not found")
+                                .error(ex.getMessage())
+                                .build()
+                );
     }
 
+    @ExceptionHandler(DishNotFoundException.class)
+    public ResponseEntity<ExceptionResponse> handleIngredientNotFoundException(DishNotFoundException ex, WebRequest request) {
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(
+                        ExceptionResponse.builder()
+                                .httpStatus(400)
+                                .timestamp(DateUtil.formatTimestamp(new Date()))
+                                .message("Ingredient not found")
+                                .error(ex.getMessage())
+                                .build()
+                );
+
+    }
 }
