@@ -123,20 +123,17 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(DishNotFoundException.class)
-    public ResponseEntity<ExceptionResponse> handleDishNotFoundException(DishNotFoundException ex, WebRequest request) {
-        return ResponseEntity
-                .status(HttpStatus.NOT_FOUND)
-                .body(
-                        ExceptionResponse.builder()
-                                .httpStatus(400)
-                                .timestamp(DateUtil.formatTimestamp(new Date()))
-                                .message("Dish not found")
-                                .error(ex.getMessage())
-                                .build()
-                );
+    public ResponseEntity<ExceptionResponse> handleDishNotFoundException(DishNotFoundException ex, WebRequest request){
+        ExceptionResponse exceptionResponse=new ExceptionResponse();
+        exceptionResponse.setHttpStatus(HttpStatus.NOT_FOUND.value());
+        exceptionResponse.setMessage(exceptionResponse.getMessage());
+        exceptionResponse.setTimestamp(DateUtil.formatTimestamp(new Date()));
+        return new ResponseEntity<ExceptionResponse>(exceptionResponse,HttpStatus.NOT_FOUND);
     }
 
-    @ExceptionHandler(DishNotFoundException.class)
+
+
+    @ExceptionHandler(IngredientNotFoundException.class)
     public ResponseEntity<ExceptionResponse> handleIngredientNotFoundException(DishNotFoundException ex, WebRequest request) {
         return ResponseEntity
                 .status(HttpStatus.NOT_FOUND)
