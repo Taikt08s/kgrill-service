@@ -100,8 +100,6 @@ public class JwtImplement implements JwtService {
                 .subject(userDetails.getUsername())
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis() + jwtExpiration))
-                .claim("role", populateAuthorities(userDetails.getAuthorities()))
-                .claim("type", "Bearer")
                 .issuer(jwtIssuer)
                 .signWith(getSignInKey())
                 .compact();
