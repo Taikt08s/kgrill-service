@@ -1,6 +1,8 @@
 package com.swd392.group2.kgrill_service.service.impl;
 
 
+import com.nimbusds.jose.JOSEException;
+import com.nimbusds.jwt.JWTClaimsSet;
 import com.swd392.group2.kgrill_model.model.Token;
 import com.swd392.group2.kgrill_model.model.User;
 
@@ -24,7 +26,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
+import java.text.ParseException;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -49,10 +51,17 @@ public class UserImplement implements UserService {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid JWT token");
         }
 
-        String username = jwtService.extractUsername(token);
+        JWTClaimsSet decryptedClaims;
+        try {
+            decryptedClaims = jwtService.decryptJwt(token);
+        } catch (JOSEException | ParseException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Failed to decrypt JWT token");
+        }
+
+        String username = decryptedClaims.getSubject();
         var user = userRepository.findByEmail(username).orElse(null);
-        if (user == null || !jwtService.isTokenValid(token, user) || accessToken.isRevoked() || accessToken.isExpired()) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("JWT token has expired and revoked");
+        if (user == null || !jwtService.isEncryptedTokenValid(decryptedClaims, user) || accessToken.isRevoked() || accessToken.isExpired()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("JWT token has expired or been revoked");
         }
 
         return CustomSuccessHandler.responseBuilder(HttpStatus.OK, "Successfully retrieved user information", user);

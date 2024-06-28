@@ -1,6 +1,7 @@
 package com.swd392.group2.kgrill_service.service.impl;
 
 import com.nimbusds.jose.*;
+import com.nimbusds.jose.crypto.DirectDecrypter;
 import com.nimbusds.jose.crypto.DirectEncrypter;
 import com.nimbusds.jwt.EncryptedJWT;
 import com.nimbusds.jwt.JWTClaimsSet;
@@ -16,6 +17,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
+import java.text.ParseException;
 import java.util.*;
 import java.util.function.Function;
 
@@ -72,23 +74,19 @@ public class JwtImplement implements JwtService {
                 .subject(userDetails.getUsername())
                 .issuer(jwtIssuer)
                 .audience(jwtIssuer)
+                .claim("role", populateAuthorities(userDetails.getAuthorities()))
+                .claim("type", "Bearer")
                 .expirationTime(new Date(System.currentTimeMillis() + jwtExpiration))
                 .issueTime(new Date());
-
         claims.forEach(claimsSetBuilder::claim);
-
         JWTClaimsSet claimsSet = claimsSetBuilder.build();
-
         JWEHeader header = new JWEHeader.Builder(JWEAlgorithm.DIR, EncryptionMethod.A256GCM)
                 .contentType("JWT")
                 .build();
-
         EncryptedJWT encryptedJWT = new EncryptedJWT(header, claimsSet);
-
         byte[] encryptionKeyBytes = Decoders.BASE64.decode(secretKey);
         DirectEncrypter encrypter = new DirectEncrypter(encryptionKeyBytes);
         encryptedJWT.encrypt(encrypter);
-
         return encryptedJWT.serialize();
     }
 
@@ -102,8 +100,6 @@ public class JwtImplement implements JwtService {
                 .subject(userDetails.getUsername())
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis() + jwtExpiration))
-                .claim("role", populateAuthorities(userDetails.getAuthorities()))
-                .claim("type", "Bearer")
                 .issuer(jwtIssuer)
                 .signWith(getSignInKey())
                 .compact();
@@ -134,5 +130,23 @@ public class JwtImplement implements JwtService {
 
     private Date extractExpiration(String jwtToken) {
         return extractClaim(jwtToken, Claims::getExpiration);
+    }
+
+    @Override
+    public JWTClaimsSet decryptJwt(String encryptedToken) throws ParseException, JOSEException {
+        byte[] encryptionKeyBytes = Decoders.BASE64.decode(secretKey);
+        EncryptedJWT encryptedJWT = EncryptedJWT.parse(encryptedToken);
+        encryptedJWT.decrypt(new DirectDecrypter(encryptionKeyBytes));
+        return encryptedJWT.getJWTClaimsSet();
+    }
+
+    public boolean isEncryptedTokenValid(JWTClaimsSet claims, UserDetails userDetails) {
+        final String username = claims.getSubject();
+        return (username.equals(userDetails.getUsername()) && !isEncryptedTokenExpired(claims));
+    }
+
+    private boolean isEncryptedTokenExpired(JWTClaimsSet claims) {
+        Date expirationTime = claims.getExpirationTime();
+        return expirationTime.before(new Date());
     }
 }
