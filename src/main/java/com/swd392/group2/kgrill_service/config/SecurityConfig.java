@@ -3,6 +3,7 @@ package com.swd392.group2.kgrill_service.config;
 import com.swd392.group2.kgrill_service.exception.CustomAuthenticationEntryPoint;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -17,6 +18,7 @@ import org.springframework.security.web.authentication.logout.LogoutHandler;
 
 import static org.springframework.security.config.Customizer.withDefaults;
 
+@ComponentScan(basePackages = {"com.swd392.group2.kgrill_service"})
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity(securedEnabled = true)
