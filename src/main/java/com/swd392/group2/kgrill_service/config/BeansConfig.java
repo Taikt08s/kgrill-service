@@ -2,6 +2,7 @@ package com.swd392.group2.kgrill_service.config;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -17,6 +18,7 @@ import org.springframework.web.filter.CorsFilter;
 
 import java.util.Arrays;
 
+@ComponentScan(basePackages = {"com.swd392.group2.kgrill_service"})
 @Configuration
 @RequiredArgsConstructor
 public class BeansConfig {
