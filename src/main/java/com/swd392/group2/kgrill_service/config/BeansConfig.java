@@ -18,7 +18,6 @@ import org.springframework.web.filter.CorsFilter;
 
 import java.util.Arrays;
 
-@ComponentScan(basePackages = {"com.swd392.group2.kgrill_service"})
 @Configuration
 @RequiredArgsConstructor
 public class BeansConfig {
