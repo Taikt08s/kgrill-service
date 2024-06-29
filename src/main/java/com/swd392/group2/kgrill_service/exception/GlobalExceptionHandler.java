@@ -10,6 +10,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.context.request.WebRequest;
 
 import java.util.*;
 
@@ -117,6 +118,32 @@ public class GlobalExceptionHandler {
                                 .timestamp(DateUtil.formatTimestamp(new Date()))
                                 .message("Registration failed")
                                 .error(exception.getMessage())
+                                .build()
+                );
+    }
+    @ExceptionHandler(DishNotFoundException.class)
+    public ResponseEntity<ExceptionResponse> handleDishNotFoundException(DishNotFoundException ex, WebRequest request){
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(
+                        ExceptionResponse.builder()
+                                .httpStatus(HttpStatus.NOT_FOUND.value())
+                                .timestamp(DateUtil.formatTimestamp(new Date()))
+                                .message("Not found")
+                                .error(ex.getMessage())
+                                .build()
+                );
+    }
+    @ExceptionHandler(IngredientNotFoundException.class)
+    public ResponseEntity<ExceptionResponse> handleIngredientNotFoundException(IngredientNotFoundException ex, WebRequest request){
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(
+                        ExceptionResponse.builder()
+                                .httpStatus(HttpStatus.NOT_FOUND.value())
+                                .timestamp(DateUtil.formatTimestamp(new Date()))
+                                .message("Not found")
+                                .error(ex.getMessage())
                                 .build()
                 );
     }
