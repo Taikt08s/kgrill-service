@@ -68,7 +68,7 @@ public class UserImplement implements UserService {
     }
 
     @Override
-    public UserProfileResponse getAllUsers(int pageNo, int pageSize, String sortBy, String sortDir, String email) {
+    public ResponseEntity<Object> getAllUsersByAdmin(int pageNo, int pageSize, String sortBy, String sortDir, String email) {
         Sort sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
         Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
 
@@ -83,7 +83,7 @@ public class UserImplement implements UserService {
         userProfileResponse.setTotalElements(UserContent.getTotalElements());
         userProfileResponse.setTotalPages(UserContent.getTotalPages());
         userProfileResponse.setLast(UserContent.isLast());
-        return userProfileResponse;
+        return CustomSuccessHandler.responseBuilder(HttpStatus.OK, "Successfully retrieved user information", userProfileResponse);
     }
 
     @Override
