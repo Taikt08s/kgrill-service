@@ -11,7 +11,7 @@ import java.util.UUID;
 public interface UserService {
     ResponseEntity<Object> getUserInformation(HttpServletRequest request);
 
-    UserProfileResponse getAllUsers(int pageNo, int pageSize, String sortBy, String sortDir, String email);
+    ResponseEntity<Object> getAllUsersByAdmin(int pageNo, int pageSize, String sortBy, String sortDir, String email);
 
     ResponseEntity<Object> updateUserProfileByAdmin(UUID id, CustomUserProfile customUserProfile);
 
