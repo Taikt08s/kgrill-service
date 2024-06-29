@@ -268,7 +268,7 @@ public class AuthImplement implements AuthService {
     }
 
     @Override
-    public AuthenticationResponse findOrCreateUser(GoogleAuthenticationRequest request) {
+    public AuthenticationResponse findOrCreateUser(GoogleAuthenticationRequest request) throws JOSEException {
         var userRole = roleRepository.findByRoleName("USER")
                 .orElseThrow(() -> new IllegalStateException("ROLE USER was not initialized"));
         var optionalUser = userRepository.findByEmail(request.getEmail());
@@ -296,7 +296,7 @@ public class AuthImplement implements AuthService {
         var extraClaimsGoogle = new HashMap<String, Object>();
         extraClaimsGoogle.put("full_name", user.fullName());
 
-        String jwtAccessToken = jwtService.generateToken(extraClaimsGoogle, user);
+        String jwtAccessToken = jwtService.generateEncryptedToken(extraClaimsGoogle, user);
         String jwtRefreshToken = jwtService.generateRefreshToken(user);
 
         logger.info(jwtAccessToken);
