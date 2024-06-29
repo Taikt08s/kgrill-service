@@ -19,5 +19,5 @@ public interface AuthService {
 
     void refreshToken(HttpServletRequest request, HttpServletResponse response) throws IOException, JOSEException;
 
-    AuthenticationResponse findOrCreateUser(GoogleAuthenticationRequest request);
+    AuthenticationResponse findOrCreateUser(GoogleAuthenticationRequest request) throws JOSEException;
 }
