@@ -18,7 +18,6 @@ import org.springframework.security.web.authentication.logout.LogoutHandler;
 
 import static org.springframework.security.config.Customizer.withDefaults;
 
-@ComponentScan(basePackages = {"com.swd392.group2.kgrill_service"})
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity(securedEnabled = true)
@@ -37,8 +36,9 @@ public class SecurityConfig {
         http.csrf(AbstractHttpConfigurer::disable)
                 .cors(withDefaults())
                 .authorizeHttpRequests(request -> request.requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/auth/**").permitAll()
-                        .requestMatchers("/account/**").hasAuthority("USER").anyRequest().authenticated()
-                        .requestMatchers("/admin/**").hasAuthority("ADMIN").anyRequest().authenticated()
+                        .requestMatchers("/account/**").hasAuthority("USER")
+                        .requestMatchers("/admin/**").hasAuthority("ADMIN")
+                        .anyRequest().authenticated()
                 )
                 .sessionManagement(manager -> manager.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider).addFilterBefore(
