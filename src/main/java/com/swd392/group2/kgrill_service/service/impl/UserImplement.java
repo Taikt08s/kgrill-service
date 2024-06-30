@@ -79,9 +79,7 @@ public class UserImplement implements UserService {
         List<CustomUserProfile> content = UserList.stream().map(UserProfile -> modelMapper.map(UserProfile, CustomUserProfile.class)).collect(Collectors.toList());
 
         for (CustomUserProfile userProfile : content) {
-            if (userProfile.getRole().equals("4")) {
-                userProfile.setRole("ADMIN");
-            } else if (userProfile.getRole().equals("1")) {
+            if (userProfile.getRole().equals("1")) {
                 userProfile.setRole("USER");
             } else if (userProfile.getRole().equals("2")) {
                 userProfile.setRole("MANAGER");
@@ -104,11 +102,37 @@ public class UserImplement implements UserService {
     public ResponseEntity<Object> updateUserProfileByAdmin(UUID id, CustomUserProfile customUserProfile) {
         User user = userRepository.findById(id).orElse(null);
         if (user != null) {
-            user.setFirstName(customUserProfile.getFirstName());
-            user.setLastName(customUserProfile.getLastName());
-            user.setAddress(customUserProfile.getAddress());
-            user.setEmail(customUserProfile.getEmail());
-            user.setAccountNotLocked(customUserProfile.isAccountNotLocked());
+
+            if (customUserProfile.getFirstName() != null) {
+                user.setFirstName(customUserProfile.getFirstName());
+            }
+            if (customUserProfile.getLastName() != null) {
+                user.setLastName(customUserProfile.getLastName());
+            }
+            if (customUserProfile.getAddress() != null) {
+                user.setAddress(customUserProfile.getAddress());
+            }
+            if (customUserProfile.getEmail() != null) {
+                user.setEmail(customUserProfile.getEmail());
+            }
+            if (customUserProfile.isAccountNotLocked() != user.isAccountNotLocked()) {
+                user.setAccountNotLocked(customUserProfile.isAccountNotLocked());
+            }
+            if (customUserProfile.getLatitude() != null) {
+                user.setLatitude(customUserProfile.getLatitude());
+            }
+
+            if (customUserProfile.getLongitude() != null) {
+                user.setLongitude(customUserProfile.getLongitude());
+            }
+
+            if (customUserProfile.getGender() != null) {
+                user.setGender(customUserProfile.getGender());
+            }
+
+            if (customUserProfile.getPhone() != null) {
+                user.setPhone(customUserProfile.getPhone());
+            }
 
             if (customUserProfile.getRole().equals("USER")) {
                 user.setRole(roleRepository.findById(1L).orElseThrow(() -> new IllegalStateException("ROLE USER was not initialized")));
@@ -116,8 +140,6 @@ public class UserImplement implements UserService {
                 user.setRole(roleRepository.findById(2L).orElseThrow(() -> new IllegalStateException("ROLE MANAGER was not initialized")));
             } else if (customUserProfile.getRole().equals("SHIPPER")) {
                 user.setRole(roleRepository.findById(3L).orElseThrow(() -> new IllegalStateException("ROLE SHIPPER was not initialized")));
-            } else if (customUserProfile.getRole().equals("ADMIN")) {
-                user.setRole(roleRepository.findById(4L).orElseThrow(() -> new IllegalStateException("ROLE ADMIN was not initialized")));
             }
 
             User updateUser = userRepository.save(user);
@@ -139,13 +161,31 @@ public class UserImplement implements UserService {
     public UserProfileDto updateUserInformation(UUID id, UserProfileDto userProfileDto) {
         User user = userRepository.findById(id).orElse(null);
         if (user != null) {
-            user.setFirstName(userProfileDto.getFirstName());
-            user.setLastName(userProfileDto.getLastName());
-            user.setAddress(userProfileDto.getAddress());
-            user.setGender(userProfileDto.getGender());
-            user.setPhone(userProfileDto.getPhone());
-            user.setLatitude(userProfileDto.getLatitude());
-            user.setLongitude(userProfileDto.getLongitude());
+            if (userProfileDto.getFirstName() != null) {
+                user.setFirstName(userProfileDto.getFirstName());
+            }
+            if (userProfileDto.getLastName() != null) {
+                user.setLastName(userProfileDto.getLastName());
+            }
+            if (userProfileDto.getAddress() != null) {
+                user.setAddress(userProfileDto.getAddress());
+            }
+
+            if (userProfileDto.getLatitude() != null) {
+                user.setLatitude(userProfileDto.getLatitude());
+            }
+
+            if (userProfileDto.getLongitude() != null) {
+                user.setLongitude(userProfileDto.getLongitude());
+            }
+
+            if (userProfileDto.getGender() != null) {
+                user.setGender(userProfileDto.getGender());
+            }
+
+            if (userProfileDto.getPhone() != null) {
+                user.setPhone(userProfileDto.getPhone());
+            }
             User updateUser = userRepository.save(user);
             return mapToUserProfileDto(updateUser);
         } else {

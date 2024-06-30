@@ -14,13 +14,15 @@ import java.util.List;
 @AllArgsConstructor
 public class UserProfileResponse {
     private List<CustomUserProfile> content;
-    @JsonProperty("page_no")
+
+    @JsonProperty(value = "page_no", index = 1)
     private int pageNo;
-    @JsonProperty("page_size")
+    @JsonProperty(value = "page_size", index = 2)
     private int pageSize;
-    @JsonProperty("total_elements")
+    @JsonProperty(value = "total_elements", index = 3)
     private long totalElements;
-    @JsonProperty("total_pages")
+    @JsonProperty(value = "total_pages",index = 4)
     private int totalPages;
+    @JsonProperty(value = "last", index = 5)
     private boolean last;
 }
