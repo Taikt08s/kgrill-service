@@ -5,6 +5,7 @@ import com.nimbusds.jose.crypto.DirectDecrypter;
 import com.nimbusds.jose.crypto.DirectEncrypter;
 import com.nimbusds.jwt.EncryptedJWT;
 import com.nimbusds.jwt.JWTClaimsSet;
+import com.swd392.group2.kgrill_model.repository.TokenRepository;
 import com.swd392.group2.kgrill_service.service.JwtService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -12,6 +13,7 @@ import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -25,6 +27,7 @@ import java.util.function.Function;
 @RequiredArgsConstructor
 public class JwtImplement implements JwtService {
 
+    private final TokenRepository tokenRepository;
     @Value("${jwt.secret-key}")
     private String secretKey;
 
@@ -148,5 +151,10 @@ public class JwtImplement implements JwtService {
     private boolean isEncryptedTokenExpired(JWTClaimsSet claims) {
         Date expirationTime = claims.getExpirationTime();
         return expirationTime.before(new Date());
+    }
+
+    @Scheduled(cron = "0 */1 * * * *")
+    public void scheduleDeleteExpiredToken() {
+        tokenRepository.deleteTokensByRevokedTrueAndExpiredTrue();
     }
 }
