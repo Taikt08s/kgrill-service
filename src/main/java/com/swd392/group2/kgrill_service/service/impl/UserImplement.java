@@ -85,6 +85,8 @@ public class UserImplement implements UserService {
                 userProfile.setRole("MANAGER");
             } else if (userProfile.getRole().equals("3")) {
                 userProfile.setRole("SHIPPER");
+            } else if (userProfile.getRole().equals("4")) {
+                userProfile.setRole("ADMIN");
             }
         }
 
