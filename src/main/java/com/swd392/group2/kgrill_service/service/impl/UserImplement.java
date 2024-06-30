@@ -136,12 +136,14 @@ public class UserImplement implements UserService {
                 user.setPhone(customUserProfile.getPhone());
             }
 
-            if (customUserProfile.getRole().equals("USER")) {
-                user.setRole(roleRepository.findById(1L).orElseThrow(() -> new IllegalStateException("ROLE USER was not initialized")));
-            } else if (customUserProfile.getRole().equals("MANAGER")) {
-                user.setRole(roleRepository.findById(2L).orElseThrow(() -> new IllegalStateException("ROLE MANAGER was not initialized")));
-            } else if (customUserProfile.getRole().equals("SHIPPER")) {
-                user.setRole(roleRepository.findById(3L).orElseThrow(() -> new IllegalStateException("ROLE SHIPPER was not initialized")));
+            if (customUserProfile.getRole()!=null){
+                if (customUserProfile.getRole().equals("USER")) {
+                    user.setRole(roleRepository.findById(1L).orElseThrow(() -> new IllegalStateException("ROLE USER was not initialized")));
+                } else if (customUserProfile.getRole().equals("MANAGER")) {
+                    user.setRole(roleRepository.findById(2L).orElseThrow(() -> new IllegalStateException("ROLE MANAGER was not initialized")));
+                } else if (customUserProfile.getRole().equals("SHIPPER")) {
+                    user.setRole(roleRepository.findById(3L).orElseThrow(() -> new IllegalStateException("ROLE SHIPPER was not initialized")));
+                }
             }
 
             User updateUser = userRepository.save(user);

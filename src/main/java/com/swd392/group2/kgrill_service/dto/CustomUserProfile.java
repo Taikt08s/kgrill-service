@@ -20,46 +20,38 @@ public class CustomUserProfile {
     private UUID id;
 
     @Schema(description = "User's first name", example = "Dang Dinh")
-    @NotBlank(message = "First name cannot be blank")
     @JsonProperty(value = "first_name", index = 2)
     private String firstName;
 
     @Schema(description = "User's last name", example = "Tai")
-    @NotBlank(message = "Last name cannot be blank")
-    @JsonProperty(value = "last_name", index = 3)
     private String lastName;
 
     @Schema(description = "User's email", example = "elysia112@gmail.com")
-    @NotBlank(message = "Email cannot be blank")
     @JsonProperty(value = "email", index = 4)
     private String email;
 
     @Schema(description = "User's address", example = "123 Main St, Springfield")
-    @NotBlank(message = "Address cannot be blank")
     @JsonProperty(value = "address", index = 5)
     private String address;
 
-    @JsonProperty(value = "latitude", index = 6)
+    @JsonProperty(index = 6)
     @Schema(description = "Latitude of the address", example = "21.123456")
     private Double latitude;
 
-    @JsonProperty(value = "longitude", index = 7)
+    @JsonProperty(index = 7)
     @Schema(description = "Longitude of the address", example = "105.123456")
     private Double longitude;
 
-    @JsonProperty(value = "address", index = 8)
+    @JsonProperty(index = 8)
     @Schema(description = "User's gender", example = "Male")
-    @NotBlank(message = "Gender cannot be blank")
     private String gender;
 
-    @JsonProperty(value = "address", index = 9)
+    @JsonProperty(index = 9)
     @Schema(description = "User's phone number", example = "(+84)877643231")
-    @NotBlank(message = "Phone number cannot be blank")
     @Pattern(regexp = "(84|0[3|5|7|8|9])+([0-9]{8})\\b", message = "Please enter a valid(+84) phone number")
     private String phone;
 
     @Schema(description = "User's role", example = "USER")
-    @NotBlank(message = "Role cannot be blank")
     @JsonProperty(value = "role", index = 10)
     private String role;
 
