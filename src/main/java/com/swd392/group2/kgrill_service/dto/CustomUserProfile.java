@@ -37,6 +37,10 @@ public class CustomUserProfile {
     @NotBlank(message = "Address cannot be blank")
     private String address;
 
+    @Schema(description = "User's role", example = "USER")
+    @NotBlank(message = "Role cannot be blank")
+    private String role;
+
     @Schema(description = "User's status", example = "Active = true, Inactive = false")
     @JsonProperty("account_not_locked")
     private boolean accountNotLocked;
