@@ -15,7 +15,6 @@ import java.util.UUID;
 @Schema(description = "Request object for account information list")
 public class CustomUserProfile {
 
-    @JsonIgnore
     @JsonProperty("user_id")
     private UUID id;
 
