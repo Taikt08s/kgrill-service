@@ -6,6 +6,7 @@ import com.nimbusds.jwt.JWTClaimsSet;
 import com.swd392.group2.kgrill_model.model.Token;
 import com.swd392.group2.kgrill_model.model.User;
 
+import com.swd392.group2.kgrill_model.repository.RoleRepository;
 import com.swd392.group2.kgrill_model.repository.TokenRepository;
 import com.swd392.group2.kgrill_model.repository.UserRepository;
 import com.swd392.group2.kgrill_service.dto.CustomUserProfile;
@@ -38,6 +39,7 @@ public class UserImplement implements UserService {
     private final TokenRepository tokenRepository;
     private final UserRepository userRepository;
     private final ModelMapper modelMapper;
+    private final RoleRepository roleRepository;
 
     @Override
     public ResponseEntity<Object> getUserInformation(HttpServletRequest request) {
@@ -76,6 +78,18 @@ public class UserImplement implements UserService {
         List<User> UserList = UserContent.getContent();
         List<CustomUserProfile> content = UserList.stream().map(UserProfile -> modelMapper.map(UserProfile, CustomUserProfile.class)).collect(Collectors.toList());
 
+        for (CustomUserProfile userProfile : content) {
+            if (userProfile.getRole().equals("4")) {
+                userProfile.setRole("ADMIN");
+            } else if (userProfile.getRole().equals("1")) {
+                userProfile.setRole("USER");
+            } else if (userProfile.getRole().equals("2")) {
+                userProfile.setRole("MANAGER");
+            } else if (userProfile.getRole().equals("3")) {
+                userProfile.setRole("SHIPPER");
+            }
+        }
+
         UserProfileResponse userProfileResponse = new UserProfileResponse();
         userProfileResponse.setContent(content);
         userProfileResponse.setPageNo(UserContent.getNumber());
@@ -95,8 +109,19 @@ public class UserImplement implements UserService {
             user.setAddress(customUserProfile.getAddress());
             user.setEmail(customUserProfile.getEmail());
             user.setAccountNotLocked(customUserProfile.isAccountNotLocked());
+
+            if (customUserProfile.getRole().equals("USER")) {
+                user.setRole(roleRepository.findById(1L).orElseThrow(() -> new IllegalStateException("ROLE USER was not initialized")));
+            } else if (customUserProfile.getRole().equals("MANAGER")) {
+                user.setRole(roleRepository.findById(2L).orElseThrow(() -> new IllegalStateException("ROLE MANAGER was not initialized")));
+            } else if (customUserProfile.getRole().equals("SHIPPER")) {
+                user.setRole(roleRepository.findById(3L).orElseThrow(() -> new IllegalStateException("ROLE SHIPPER was not initialized")));
+            } else if (customUserProfile.getRole().equals("ADMIN")) {
+                user.setRole(roleRepository.findById(4L).orElseThrow(() -> new IllegalStateException("ROLE ADMIN was not initialized")));
+            }
+
             User updateUser = userRepository.save(user);
-            return CustomSuccessHandler.responseBuilder(HttpStatus.OK, "user profile update successfully",updateUser );
+            return CustomSuccessHandler.responseBuilder(HttpStatus.OK, "user profile update successfully", updateUser);
         } else {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Update failed");
         }
