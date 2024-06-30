@@ -14,7 +14,6 @@ import java.util.List;
 @AllArgsConstructor
 public class UserProfileResponse {
     private List<CustomUserProfile> content;
-
     @JsonProperty("page_no")
     private int pageNo;
     @JsonProperty("page_size")
