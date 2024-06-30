@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import lombok.*;
 
 import java.util.UUID;
@@ -15,32 +16,48 @@ import java.util.UUID;
 @Schema(description = "Request object for account information list")
 public class CustomUserProfile {
 
-    @JsonIgnore
-    @JsonProperty("user_id")
+    @JsonProperty(value = "user_id", index = 1)
     private UUID id;
 
     @Schema(description = "User's first name", example = "Dang Dinh")
-    @NotBlank(message = "First name cannot be blank")
-    @JsonProperty("first_name")
+    @JsonProperty(value = "first_name", index = 2)
     private String firstName;
 
     @Schema(description = "User's last name", example = "Tai")
-    @NotBlank(message = "Last name cannot be blank")
-    @JsonProperty("last_name")
     private String lastName;
 
-    @Schema(description = "User's email", example = "tinhvv02012003@gmail.com")
-    @NotBlank(message = "Email cannot be blank")
+    @Schema(description = "User's email", example = "elysia112@gmail.com")
+    @JsonProperty(value = "email", index = 4)
     private String email;
 
     @Schema(description = "User's address", example = "123 Main St, Springfield")
-    @NotBlank(message = "Address cannot be blank")
+    @JsonProperty(value = "address", index = 5)
     private String address;
 
-    @Schema(description = "User's status", example = "Active = true, Inactive = false")
-    @JsonProperty("account_not_locked")
-    private boolean accountNotLocked;
+    @JsonProperty(index = 6)
+    @Schema(description = "Latitude of the address", example = "21.123456")
+    private Double latitude;
 
+    @JsonProperty(index = 7)
+    @Schema(description = "Longitude of the address", example = "105.123456")
+    private Double longitude;
+
+    @JsonProperty(index = 8)
+    @Schema(description = "User's gender", example = "Male")
+    private String gender;
+
+    @JsonProperty(index = 9)
+    @Schema(description = "User's phone number", example = "(+84)877643231")
+    @Pattern(regexp = "(84|0[3|5|7|8|9])+([0-9]{8})\\b", message = "Please enter a valid(+84) phone number")
+    private String phone;
+
+    @Schema(description = "User's role", example = "USER")
+    @JsonProperty(value = "role", index = 10)
+    private String role;
+
+    @Schema(description = "User's status", example = "true")
+    @JsonProperty(value = "account_not_locked",index = 11)
+    private boolean accountNotLocked;
 
 
 }
