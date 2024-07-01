@@ -280,6 +280,10 @@ public class AuthImplement implements AuthService {
             user.setLastName(request.getLastName());
             user.setEmail(request.getEmail());
             user.setRole(userRole);
+            user.setAddress("");
+            user.setPhone("");
+            user.setGender("");
+            user.setDob(null);
             user.setProfilePic(request.getPhotoUrl());
             user.setEnable(true);
             user.setAccountNotLocked(true);
