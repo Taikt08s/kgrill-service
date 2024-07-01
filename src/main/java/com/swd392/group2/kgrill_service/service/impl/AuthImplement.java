@@ -77,6 +77,8 @@ public class AuthImplement implements AuthService {
                 .email(request.getEmail())
                 .address(request.getAddress())
                 .phone(request.getPhone())
+                .gender("")
+                .dob(null)
                 .password(passwordEncoder.encode(request.getPassword()))
                 .accountNotLocked(true)
                 .enable(false)
