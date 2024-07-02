@@ -214,6 +214,7 @@ public class UserImplement implements UserService {
         userProfileDto.setLastName(user.getLastName());
         userProfileDto.setAddress(user.getAddress());
         userProfileDto.setGender(user.getGender());
+        userProfileDto.setDob(user.getDob());
         userProfileDto.setPhone(userProfileDto.getPhone());
 
         return userProfileDto;
