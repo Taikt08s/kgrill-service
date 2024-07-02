@@ -207,6 +207,28 @@ public class UserImplement implements UserService {
         }
     }
 
+    @Override
+    public ResponseEntity<Object> getNumberOfUsersByRoleId(String roleName) {
+
+        Long roleId = null;
+        if (roleName != null) {
+            if (roleName.trim().equalsIgnoreCase("USER")) {
+                roleId = 1L;
+            } else if (roleName.trim().equalsIgnoreCase("SHIPPER")) {
+                roleId = 2L;
+            } else if (roleName.trim().equalsIgnoreCase("MANAGER")) {
+                roleId = 3L;
+            }
+        }
+
+        if (roleId == null) {
+            return CustomSuccessHandler.responseBuilder(HttpStatus.BAD_REQUEST, "Invalid role name", null);
+        }
+
+        long count = userRepository.countUserWithRoleId(roleId);
+        return CustomSuccessHandler.responseBuilder(HttpStatus.OK, "Number of users retrieve successfully", count);
+    }
+
     private UserProfileDto mapToUserProfileDto(User user) {
         UserProfileDto userProfileDto = new UserProfileDto();
         userProfileDto.setId(user.getUserId());

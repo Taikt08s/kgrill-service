@@ -59,5 +59,9 @@ public class CustomUserProfile {
     @JsonProperty(value = "account_not_locked",index = 11)
     private boolean accountNotLocked;
 
+    @Schema(description = "User's avatar", example = "https://www.google.com")
+    @JsonProperty(value = "profile_picture", index = 12)
+    private String profilePicture;
+
 
 }
