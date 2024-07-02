@@ -77,6 +77,8 @@ public class AuthImplement implements AuthService {
                 .email(request.getEmail())
                 .address(request.getAddress())
                 .phone(request.getPhone())
+                .gender("")
+                .dob("")
                 .password(passwordEncoder.encode(request.getPassword()))
                 .accountNotLocked(true)
                 .enable(false)
@@ -278,6 +280,10 @@ public class AuthImplement implements AuthService {
             user.setLastName(request.getLastName());
             user.setEmail(request.getEmail());
             user.setRole(userRole);
+            user.setAddress("");
+            user.setPhone("");
+            user.setGender("");
+            user.setDob("");
             user.setProfilePic(request.getPhotoUrl());
             user.setEnable(true);
             user.setAccountNotLocked(true);
