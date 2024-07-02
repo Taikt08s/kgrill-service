@@ -19,5 +19,7 @@ public interface UserService {
 
     void updateUserProfilePicture(UUID id, String profilePictureUrl);
 
+    ResponseEntity<Object> getNumberOfUsersByRoleId (String roleName);
+
 
 }
