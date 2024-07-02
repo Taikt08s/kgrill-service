@@ -44,8 +44,10 @@ public class UserProfileDto {
     private Double longitude;
 
     @Schema(description = "User's gender", example = "Male")
-    @NotBlank(message = "Gender cannot be blank")
     private String gender;
+
+    @Schema(description = "User's date of birth", example = "26-10-2003")
+    private String dob;
 
     @Schema(description = "User's phone number", example = "(+84)877643231")
     @NotBlank(message = "Phone number cannot be blank")
