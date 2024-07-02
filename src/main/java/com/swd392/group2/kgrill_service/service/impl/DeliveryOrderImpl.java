@@ -148,8 +148,6 @@ public class DeliveryOrderImpl implements DeliveryOrderService {
            completedOrder = totalPrice - cancelledOrder;
         }
 
-
-
         RevenueResponse revenueResponse = new RevenueResponse();
         revenueResponse.setContent(content);
         revenueResponse.setPageNo(pageable.getPageNumber());
