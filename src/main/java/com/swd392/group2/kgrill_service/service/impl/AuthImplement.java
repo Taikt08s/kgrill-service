@@ -78,7 +78,7 @@ public class AuthImplement implements AuthService {
                 .address(request.getAddress())
                 .phone(request.getPhone())
                 .gender("")
-                .dob(null)
+                .dob("")
                 .password(passwordEncoder.encode(request.getPassword()))
                 .accountNotLocked(true)
                 .enable(false)
@@ -283,7 +283,7 @@ public class AuthImplement implements AuthService {
             user.setAddress("");
             user.setPhone("");
             user.setGender("");
-            user.setDob(null);
+            user.setDob("");
             user.setProfilePic(request.getPhotoUrl());
             user.setEnable(true);
             user.setAccountNotLocked(true);
