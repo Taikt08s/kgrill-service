@@ -1,19 +1,23 @@
 package com.swd392.group2.kgrill_service.service;
 
-import com.swd392.group2.kgrill_model.model.Package;
-import com.swd392.group2.kgrill_service.dto.PackageRequest;
-import com.swd392.group2.kgrill_service.dto.PackageResponseForAdmin;
+import com.swd392.group2.kgrill_service.dto.request.PackageRequest;
+import com.swd392.group2.kgrill_service.dto.response.PackageResponseForAdminAndManager;
+import com.swd392.group2.kgrill_service.dto.response.PackageResponseForMobileAsList;
 import org.springframework.data.domain.Page;
+
+import java.util.List;
 
 public interface PackageService{
 
-    void AddPackage(PackageRequest pkgRequest);
+    void addPackage(PackageRequest pkgRequest);
 
-    void UpdatePackage(PackageRequest pkgRequest);
+    void updatePackage(PackageRequest pkgRequest);
 
-    void DeletePackageById(int id);
+    void deletePackageById(int id);
 
-    Page<PackageResponseForAdmin> searchPackageByFilter(int pageNumber, int pageSize, String sortField, String sortDir);
+    Page<PackageResponseForAdminAndManager> searchPackageByFilter(int pageNumber, int pageSize, String sortField, String sortDir);
 
-    Page<PackageResponseForAdmin> GetAllPackagePages(int pageNumber, int pageSize, String sortField, String sortDir);
+    Page<PackageResponseForAdminAndManager> getAllPackagePages(int pageNumber, int pageSize, String sortField, String sortDir);
+
+    List<PackageResponseForMobileAsList> getAllPackageOnMobile();
 }
