@@ -11,4 +11,9 @@ public interface DeliveryOrderService {
     ResponseEntity<Object> updateDeliveryOrderLocation (Long id, DeliveryLocationDTO deliveryLocationDTO);
 
     void addPackageToDeliveryOrder (UUID userId, int packageId, int quantity);
+
+    ResponseEntity<Object> getNumberOfOrders();
+
+    ResponseEntity<Object> getRevenueByPeriod(int pageNo, int pageSize, String sortBy, String sortDir, String period);
+
 }

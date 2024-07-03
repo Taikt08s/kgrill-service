@@ -24,6 +24,7 @@ public class CustomUserProfile {
     private String firstName;
 
     @Schema(description = "User's last name", example = "Tai")
+    @JsonProperty(value = "last_name", index = 3)
     private String lastName;
 
     @Schema(description = "User's email", example = "elysia112@gmail.com")
@@ -58,6 +59,14 @@ public class CustomUserProfile {
     @Schema(description = "User's status", example = "true")
     @JsonProperty(value = "account_not_locked",index = 11)
     private boolean accountNotLocked;
+
+    @Schema(description = "User's avatar", example = "https://www.google.com")
+    @JsonProperty(value = "profile_picture", index = 12)
+    private String profilePicture;
+
+    @Schema(description = "User's date of birth", example = "26-10-2003")
+    @JsonProperty(value = "dob", index = 13)
+    private String dob;
 
 
 }

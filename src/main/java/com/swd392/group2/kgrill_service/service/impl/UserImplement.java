@@ -79,14 +79,10 @@ public class UserImplement implements UserService {
         List<CustomUserProfile> content = UserList.stream().map(UserProfile -> modelMapper.map(UserProfile, CustomUserProfile.class)).collect(Collectors.toList());
 
         for (CustomUserProfile userProfile : content) {
-            if (userProfile.getRole().equals("1")) {
-                userProfile.setRole("USER");
-            } else if (userProfile.getRole().equals("2")) {
-                userProfile.setRole("MANAGER");
-            } else if (userProfile.getRole().equals("3")) {
-                userProfile.setRole("SHIPPER");
-            } else if (userProfile.getRole().equals("4")) {
-                userProfile.setRole("ADMIN");
+            switch (userProfile.getRole()) {
+                case "1" -> userProfile.setRole("USER");
+                case "2" -> userProfile.setRole("MANAGER");
+                case "3" -> userProfile.setRole("SHIPPER");
             }
         }
 
@@ -134,6 +130,14 @@ public class UserImplement implements UserService {
 
             if (customUserProfile.getPhone() != null) {
                 user.setPhone(customUserProfile.getPhone());
+            }
+
+            if (customUserProfile.getProfilePicture() != null) {
+                user.setProfilePic(customUserProfile.getProfilePicture());
+            }
+
+            if (customUserProfile.getDob() != null) {
+                user.setDob(customUserProfile.getDob());
             }
 
             if (customUserProfile.getRole()!=null){
@@ -207,6 +211,28 @@ public class UserImplement implements UserService {
         }
     }
 
+    @Override
+    public ResponseEntity<Object> getNumberOfUsersByRoleId(String roleName) {
+
+        Long roleId = null;
+        if (roleName != null) {
+            if (roleName.trim().equalsIgnoreCase("USER")) {
+                roleId = 1L;
+            } else if (roleName.trim().equalsIgnoreCase("SHIPPER")) {
+                roleId = 2L;
+            } else if (roleName.trim().equalsIgnoreCase("MANAGER")) {
+                roleId = 3L;
+            }
+        }
+
+        if (roleId == null) {
+            return CustomSuccessHandler.responseBuilder(HttpStatus.BAD_REQUEST, "Invalid role name", null);
+        }
+
+        long count = userRepository.countUserWithRoleId(roleId);
+        return CustomSuccessHandler.responseBuilder(HttpStatus.OK, "Number of users retrieve successfully", count);
+    }
+
     private UserProfileDto mapToUserProfileDto(User user) {
         UserProfileDto userProfileDto = new UserProfileDto();
         userProfileDto.setId(user.getUserId());
@@ -214,6 +240,7 @@ public class UserImplement implements UserService {
         userProfileDto.setLastName(user.getLastName());
         userProfileDto.setAddress(user.getAddress());
         userProfileDto.setGender(user.getGender());
+        userProfileDto.setDob(user.getDob());
         userProfileDto.setPhone(userProfileDto.getPhone());
 
         return userProfileDto;

@@ -60,12 +60,12 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ExceptionResponse> handleMethodArgumentNotValidException(MethodArgumentNotValidException exp) {
-        Map<String,String> errors = new HashMap<>();
+        Map<String, String> errors = new HashMap<>();
         exp.getBindingResult().getAllErrors()
                 .forEach(error -> {
                     var fieldName = ((FieldError) error).getField();
                     var errorMessage = error.getDefaultMessage();
-                    errors.put(fieldName,errorMessage);
+                    errors.put(fieldName, errorMessage);
                 });
 
         return ResponseEntity
@@ -121,21 +121,9 @@ public class GlobalExceptionHandler {
                                 .build()
                 );
     }
+
     @ExceptionHandler(DishNotFoundException.class)
-    public ResponseEntity<ExceptionResponse> handleDishNotFoundException(DishNotFoundException ex, WebRequest request){
-        return ResponseEntity
-                .status(HttpStatus.NOT_FOUND)
-                .body(
-                        ExceptionResponse.builder()
-                                .httpStatus(HttpStatus.NOT_FOUND.value())
-                                .timestamp(DateUtil.formatTimestamp(new Date()))
-                                .message("Not found")
-                                .error(ex.getMessage())
-                                .build()
-                );
-    }
-    @ExceptionHandler(IngredientNotFoundException.class)
-    public ResponseEntity<ExceptionResponse> handleIngredientNotFoundException(IngredientNotFoundException ex, WebRequest request){
+    public ResponseEntity<ExceptionResponse> handleDishNotFoundException(DishNotFoundException ex, WebRequest request) {
         return ResponseEntity
                 .status(HttpStatus.NOT_FOUND)
                 .body(
@@ -148,4 +136,32 @@ public class GlobalExceptionHandler {
                 );
     }
 
+    @ExceptionHandler(IngredientNotFoundException.class)
+    public ResponseEntity<ExceptionResponse> handleIngredientNotFoundException(IngredientNotFoundException ex, WebRequest request) {
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(
+                        ExceptionResponse.builder()
+                                .httpStatus(HttpStatus.NOT_FOUND.value())
+                                .timestamp(DateUtil.formatTimestamp(new Date()))
+                                .message("Not found")
+                                .error(ex.getMessage())
+                                .build()
+                );
+    }
+
+    public ResponseEntity<ExceptionResponse> handleResourceNotFoundException(
+            ResourceNotFoundException ex) {
+    return ResponseEntity
+            .status(HttpStatus.NOT_FOUND)
+            .body(
+                    ExceptionResponse.builder()
+                            .httpStatus(HttpStatus.NOT_FOUND.value())
+                            .timestamp(DateUtil.formatTimestamp(new Date()))
+                            .message("Not found")
+                            .error(ex.getMessage())
+                            .build()
+            );
+
+    }
 }
