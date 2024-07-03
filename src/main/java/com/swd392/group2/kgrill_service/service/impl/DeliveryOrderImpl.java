@@ -93,11 +93,19 @@ public class DeliveryOrderImpl implements DeliveryOrderService {
     }
 
     @Override
-    public ResponseEntity<Object> getRevenueByDaily(int pageNo, int pageSize, String sortBy, String sortDir) {
+    public ResponseEntity<Object> getRevenueByPeriod(int pageNo, int pageSize, String sortBy, String sortDir, String period) {
 
         Sort sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
         Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
-        Page<DeliveryOrder> deliveryOrderPage = deliveryOrderRepository.getDeliveryOrderByYearly(pageable);
+
+        Page<DeliveryOrder> deliveryOrderPage = deliveryOrderRepository.getDeliveryOrderByMonthly(pageable);
+
+        if (period.equalsIgnoreCase("yearly")) {
+            deliveryOrderPage = deliveryOrderRepository.getDeliveryOrderByYearly(pageable);
+        } else if (period.equalsIgnoreCase("daily")) {
+            deliveryOrderPage = deliveryOrderRepository.getDeliveryOrderByDaily(pageable);
+        }
+
         List<DeliveryOrder> deliveryOrders = deliveryOrderPage.getContent();
         List<DeliveryResponseForRevenue> content = deliveryOrders.stream()
                 .map(deliveryOrder -> modelMapper.map(deliveryOrder, DeliveryResponseForRevenue.class))
@@ -136,16 +144,16 @@ public class DeliveryOrderImpl implements DeliveryOrderService {
             totalPrice += deliveryOrderPrice;
 
             //Tính completed order và cancelled order
-           if (d.getStatus().equals("Cancelled")) {
+            if (d.getStatus().equals("Cancelled")) {
                 List<OrderDetail> orders = orderDetailRepository.findByDeliveryOrderId(d.getId());
                 for (OrderDetail o : orders) {
                     if (Objects.equals(o.getOrder().getId(), d.getId())) {
                         cancelledOrder += o.getComboPrice() * o.getQuantity();
                     }
                 }
-           }
+            }
 
-           completedOrder = totalPrice - cancelledOrder;
+            completedOrder = totalPrice - cancelledOrder;
         }
 
         RevenueResponse revenueResponse = new RevenueResponse();
