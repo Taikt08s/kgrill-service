@@ -294,10 +294,7 @@ public class AuthImplement implements AuthService {
             user.setFirstName(request.getFirstName());
             user.setLastName(request.getLastName());
             user.setEmail(request.getEmail());
-            if (user.getProfilePic() == null || !user.getProfilePic().equals(request.getPhotoUrl())) {
-                user.setProfilePic(request.getPhotoUrl());
-                userRepository.save(user);
-            }
+            userRepository.save(user);
         }
         var extraClaimsGoogle = new HashMap<String, Object>();
         extraClaimsGoogle.put("full_name", user.fullName());
