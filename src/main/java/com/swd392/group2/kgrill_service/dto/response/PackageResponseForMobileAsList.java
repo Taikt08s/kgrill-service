@@ -1,4 +1,4 @@
-package com.swd392.group2.kgrill_service.dto;
+package com.swd392.group2.kgrill_service.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -11,8 +11,8 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Schema(description = "Response object for Package to show in Package list")
-public class PackageResponseForAdmin {
+@Schema(description = "Response object for Package to show as list on mobile")
+public class PackageResponseForMobileAsList {
 
     @JsonProperty("package_id")
     private Integer id;
@@ -21,18 +21,11 @@ public class PackageResponseForAdmin {
     @JsonProperty("package_name")
     private String name;
 
-    @Schema(description = "Package's code", example = "FP-001")
-    @JsonProperty("package_code")
-    private String code;
-
     @Schema(description = "Package's price", example = "999000")
     @JsonProperty("package_price")
     private Float price;
 
-    @Schema(description = "Package's active status", example = "inactive")
-    @JsonProperty("package_active_status")
-    private boolean active;
-
+    @Schema(description = "Package's thumbnail url")
     @JsonProperty("package_thumbnail")
     private String thumbnail;
 }
