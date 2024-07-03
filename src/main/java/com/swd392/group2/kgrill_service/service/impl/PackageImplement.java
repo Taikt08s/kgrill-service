@@ -6,6 +6,7 @@ import com.swd392.group2.kgrill_model.repository.PackageRepository;
 import com.swd392.group2.kgrill_service.dto.request.PackageRequest;
 import com.swd392.group2.kgrill_service.dto.response.PackageResponseForAdminAndManager;
 import com.swd392.group2.kgrill_service.dto.mobiledto.PackageDishDtoOnMobile;
+import com.swd392.group2.kgrill_service.dto.response.PackageResponseForMobileAsList;
 import com.swd392.group2.kgrill_service.service.PackageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -13,6 +14,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -63,6 +66,11 @@ public class PackageImplement implements PackageService {
 
         Page<Package> packages = packageRepository.findAll(pageable);
         return packages.map(this::mapToPackageResponseForAdmin);
+    }
+
+    @Override
+    public List<PackageResponseForMobileAsList> getAllPackageOnMobile() {
+        return List.of();
     }
 
     private PackageResponseForAdminAndManager mapToPackageResponseForAdmin(Package pkg) {
