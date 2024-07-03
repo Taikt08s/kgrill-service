@@ -79,14 +79,10 @@ public class UserImplement implements UserService {
         List<CustomUserProfile> content = UserList.stream().map(UserProfile -> modelMapper.map(UserProfile, CustomUserProfile.class)).collect(Collectors.toList());
 
         for (CustomUserProfile userProfile : content) {
-            if (userProfile.getRole().equals("1")) {
-                userProfile.setRole("USER");
-            } else if (userProfile.getRole().equals("2")) {
-                userProfile.setRole("MANAGER");
-            } else if (userProfile.getRole().equals("3")) {
-                userProfile.setRole("SHIPPER");
-            } else if (userProfile.getRole().equals("4")) {
-                userProfile.setRole("ADMIN");
+            switch (userProfile.getRole()) {
+                case "1" -> userProfile.setRole("USER");
+                case "2" -> userProfile.setRole("MANAGER");
+                case "3" -> userProfile.setRole("SHIPPER");
             }
         }
 
@@ -134,6 +130,14 @@ public class UserImplement implements UserService {
 
             if (customUserProfile.getPhone() != null) {
                 user.setPhone(customUserProfile.getPhone());
+            }
+
+            if (customUserProfile.getProfilePicture() != null) {
+                user.setProfilePic(customUserProfile.getProfilePicture());
+            }
+
+            if (customUserProfile.getDob() != null) {
+                user.setDob(customUserProfile.getDob());
             }
 
             if (customUserProfile.getRole()!=null){
