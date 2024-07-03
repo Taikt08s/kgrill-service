@@ -1,4 +1,4 @@
-package com.swd392.group2.kgrill_service.dto;
+package com.swd392.group2.kgrill_service.dto.request;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -27,9 +27,17 @@ public class PackageRequest {
     @JsonProperty("package_price")
     private Float price;
 
-    @Schema(description = "Package's description", example = "Nguyên liệu chính: bò, phô mai,...")
-    @JsonProperty("package_code")
+    @Schema(description = "Package's description", example = "Combo Bò nướng mĩ vị Tailor là combo phù hợp với ...")
+    @JsonProperty("package_description")
     private String description;
+
+    @Schema(description = "Package's type", example = "lẩu")
+    @JsonProperty("package_type")
+    private String packageType;
+
+    @Schema(description = "Package's size", example = "1 - 2 người")
+    @JsonProperty("package_size")
+    private String packageSize;
 
     @Schema(description = "Package's active status", example = "inactive")
     @JsonProperty("package_active_status")
