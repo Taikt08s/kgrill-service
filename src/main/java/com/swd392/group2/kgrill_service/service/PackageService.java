@@ -1,6 +1,7 @@
 package com.swd392.group2.kgrill_service.service;
 
 import com.swd392.group2.kgrill_service.dto.request.PackageRequest;
+import com.swd392.group2.kgrill_service.dto.response.PackageDetailResponseForMobile;
 import com.swd392.group2.kgrill_service.dto.response.PackageResponseForAdminAndManager;
 import com.swd392.group2.kgrill_service.dto.response.PackageResponseForMobileAsList;
 import org.springframework.data.domain.Page;
@@ -20,4 +21,6 @@ public interface PackageService{
     Page<PackageResponseForAdminAndManager> getAllPackagePages(int pageNumber, int pageSize, String sortField, String sortDir);
 
     List<PackageResponseForMobileAsList> getAllPackageOnMobile();
+
+    PackageDetailResponseForMobile getPackageDetailOnMobile(int id);
 }
