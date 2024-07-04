@@ -8,6 +8,10 @@ import com.swd392.group2.kgrill_service.dto.IngredientDTO;
 import com.swd392.group2.kgrill_service.exception.IngredientNotFoundException;
 import com.swd392.group2.kgrill_service.service.IngredientService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -34,11 +38,11 @@ public class IngredientImplement implements IngredientService {
         return ingredientResponse;
     }
 
-    @Override
-    public List<IngredientDTO> getAllIngredient() {
-        List<Ingredient> ins = ingredientRepository.findAll();
-        return ins.stream().map(d -> mapToDto(d)).collect(Collectors.toList());
-    }
+//    @Override
+//    public List<IngredientDTO> getAllIngredient() {
+//        List<Ingredient> ins = ingredientRepository.findAll();
+//        return ins.stream().map(d -> mapToDto(d)).collect(Collectors.toList());
+//    }
 
     @Override
     public IngredientDTO getIngredientByID(int id)
@@ -65,6 +69,26 @@ public class IngredientImplement implements IngredientService {
         Ingredient ingredient = ingredientRepository.findById(id).orElseThrow(()->new IngredientNotFoundException("Ingredient could not be found"));
         ingredientRepository.delete(ingredient);
     }
+
+    @Override
+    public Page<IngredientDTO> searchIngredientByFilter(int pageNumber, int pageSize, String sortField, String sortDir) {
+        Sort sort = Sort.by(sortField);
+        sort = sortDir.equals("asc") ? sort.ascending() : sort.descending();
+        Pageable pageable = PageRequest.of(pageNumber - 1, pageSize, sort);
+
+        return null;
+    }
+
+    @Override
+    public Page<IngredientDTO> getAllIngredients(int pageNumber, int pageSize, String sortField, String sortDir) {
+        Sort sort = Sort.by(sortField);
+        sort = sortDir.equals("asc") ? sort.ascending() : sort.descending();
+        Pageable pageable = PageRequest.of(pageNumber - 1, pageSize, sort);
+
+        Page<Ingredient> ins = ingredientRepository.findAll(pageable);
+        return ins.map(this::mapToDto);
+    }
+
     private IngredientDTO mapToDto(Ingredient ingredient){
         IngredientDTO ingredientDTO = new IngredientDTO();
         ingredientDTO.setId(ingredient.getId());

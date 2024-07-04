@@ -7,6 +7,10 @@ import com.swd392.group2.kgrill_service.dto.DishDTO;
 import com.swd392.group2.kgrill_service.exception.DishNotFoundException;
 import com.swd392.group2.kgrill_service.service.DishService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -38,11 +42,11 @@ public class DishImplement implements DishService {
         return dishResponse;
     }
 
-    @Override
-    public List<DishDTO> getAllDish() {
-        List<Dish> dishes = dishRepository.findAll();
-        return dishes.stream().map(d -> mapToDto(d)).collect(Collectors.toList());
-    }
+//    @Override
+//    public List<DishDTO> getAllDish() {
+//        List<Dish> dishes = dishRepository.findAll();
+//        return dishes.stream().map(d -> mapToDto(d)).collect(Collectors.toList());
+//    }
 
     @Override
     public DishDTO getDishByID(int id) {
@@ -77,6 +81,25 @@ public class DishImplement implements DishService {
     public void deleteDish(int id) {
         Dish dish = dishRepository.findById(id).orElseThrow(()->new DishNotFoundException("Dish could not be found"));
         dishRepository.delete(dish);
+    }
+
+    @Override
+    public Page<DishDTO> searchDishByFilter(int pageNumber, int pageSize, String sortField, String sortDir) {
+        Sort sort = Sort.by(sortField);
+        sort = sortDir.equals("asc") ? sort.ascending() : sort.descending();
+        Pageable pageable = PageRequest.of(pageNumber - 1, pageSize, sort);
+
+        return null;
+    }
+
+    @Override
+    public Page<DishDTO> getAllDishes(int pageNumber, int pageSize, String sortField, String sortDir) {
+        Sort sort = Sort.by(sortField);
+        sort = sortDir.equals("asc") ? sort.ascending() : sort.descending();
+        Pageable pageable = PageRequest.of(pageNumber - 1, pageSize, sort);
+
+        Page<Dish> dishes = dishRepository.findAll(pageable);
+        return dishes.map(this::mapToDto);
     }
 
     private DishDTO mapToDto(Dish dish){
