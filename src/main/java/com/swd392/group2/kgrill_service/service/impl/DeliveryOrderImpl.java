@@ -96,7 +96,6 @@ public class DeliveryOrderImpl implements DeliveryOrderService {
 
     @Override
     public ResponseEntity<Object> getRevenueByPeriod(int pageNo, int pageSize, String sortBy, String sortDir, String period, LocalDate startDate) {
-
         Sort sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
         Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
 
@@ -108,8 +107,6 @@ public class DeliveryOrderImpl implements DeliveryOrderService {
 
         for (Map.Entry<Object, List<DeliveryOrder>> map : groupedList.entrySet()) {
             RevenueElementResponse revenueElementResponse = new RevenueElementResponse();
-
-
 
 //             Lấy ngày đặt hàng
             revenueElementResponse.setOrderDate(getDateTimeFormatter(map.getKey(), period));
@@ -157,7 +154,6 @@ public class DeliveryOrderImpl implements DeliveryOrderService {
         } else {
             content.sort(Comparator.comparing(RevenueElementResponse::getOrderDate));
         }
-
 
         RevenueResponse revenueResponse = new RevenueResponse();
         revenueResponse.setContent(content);
