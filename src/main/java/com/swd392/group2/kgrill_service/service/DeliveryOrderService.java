@@ -4,6 +4,8 @@ import com.swd392.group2.kgrill_model.model.Package;
 import com.swd392.group2.kgrill_service.dto.DeliveryLocationDTO;
 import org.springframework.http.ResponseEntity;
 
+import java.sql.Date;
+import java.time.LocalDate;
 import java.util.UUID;
 
 public interface DeliveryOrderService {
@@ -14,6 +16,8 @@ public interface DeliveryOrderService {
 
     ResponseEntity<Object> getNumberOfOrders();
 
-    ResponseEntity<Object> getRevenueByPeriod(int pageNo, int pageSize, String sortBy, String sortDir, String period);
+    ResponseEntity<Object> getRevenueByPeriod(int pageNo, int pageSize, String sortBy, String sortDir, String period, LocalDate startDate);
+
+    ResponseEntity<Object> getRevenueDetailByPeriod(int pageNo, int pageSize, String sortBy, String sortDir, String period, LocalDate startDate);
 
 }
