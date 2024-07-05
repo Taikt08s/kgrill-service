@@ -3,13 +3,11 @@ package com.swd392.group2.kgrill_service.dto;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.persistence.JoinColumn;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -18,8 +16,8 @@ import java.util.UUID;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Schema(description = "Delivery Response object for Revenue")
-public class DeliveryResponseForRevenue {
+@Schema(description = "Delivery order element Response object for Revenue detail")
+public class RevenueDetailElementResponse {
 
     @JsonProperty(value = "Delivery_order_id", index = 1)
     private Integer id;
@@ -57,12 +55,6 @@ public class DeliveryResponseForRevenue {
     @JsonProperty(value = "Package_name", index = 3)
     @Schema(description = "Package's name", example = "Combo Bò nướng mĩ vị Tailor")
     private List<String> packageName;
-
-
-
-
-
-
 
 
 }
