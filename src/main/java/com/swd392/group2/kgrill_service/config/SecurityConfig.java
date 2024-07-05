@@ -3,7 +3,6 @@ package com.swd392.group2.kgrill_service.config;
 import com.swd392.group2.kgrill_service.exception.CustomAuthenticationEntryPoint;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -36,8 +35,9 @@ public class SecurityConfig {
         http.csrf(AbstractHttpConfigurer::disable)
                 .cors(withDefaults())
                 .authorizeHttpRequests(request -> request.requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/auth/**").permitAll()
-                        .requestMatchers("/account/**").hasAuthority("USER")
+                        .requestMatchers("/account/**", "/mobile/food-package/**").hasAuthority("USER")
                         .requestMatchers("/admin/**").hasAuthority("ADMIN")
+                        .requestMatchers("/dish/**", "/food-package/**", "/ingredient/**").hasAuthority("MANAGER")
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(manager -> manager.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
