@@ -21,6 +21,10 @@ public class PackageResponseForAdminAndManager {
     @JsonProperty("package_name")
     private String name;
 
+    @Schema(description = "Package's description", example = "Combo Bò nướng mĩ vị Tailor là combo phù hợp với ...")
+    @JsonProperty("package_description")
+    private String description;
+
     @Schema(description = "Package's code", example = "FP-001")
     @JsonProperty("package_code")
     private String code;

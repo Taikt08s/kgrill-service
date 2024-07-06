@@ -1,12 +1,14 @@
 package com.swd392.group2.kgrill_service.dto.request;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.swd392.group2.kgrill_service.dto.PackageDishDto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.util.List;
 
 @Builder
 @Data
@@ -15,7 +17,6 @@ import lombok.NoArgsConstructor;
 @Schema(description = "Request object for Package")
 public class PackageRequest {
 
-    @JsonIgnore
     @JsonProperty("package_id")
     private Integer id;
 
@@ -26,6 +27,10 @@ public class PackageRequest {
     @Schema(description = "Package's price", example = "999000")
     @JsonProperty("package_price")
     private Float price;
+
+    @Schema(description = "Package's code", example = "FP-001")
+    @JsonProperty("package_code")
+    private String code;
 
     @Schema(description = "Package's description", example = "Combo Bò nướng mĩ vị Tailor là combo phù hợp với ...")
     @JsonProperty("package_description")
@@ -42,6 +47,10 @@ public class PackageRequest {
     @Schema(description = "Package's active status", example = "inactive")
     @JsonProperty("package_active_status")
     private boolean active;
+
+    @Schema(description = "Package's dish list")
+    @JsonProperty("package_dish_list")
+    private List<PackageDishDto> packageDishList;
 
     @JsonProperty("package_thumbnail")
     private String thumbnail;
