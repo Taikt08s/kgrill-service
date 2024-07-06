@@ -1,14 +1,18 @@
 package com.swd392.group2.kgrill_service.service.impl;
 
+import com.swd392.group2.kgrill_model.model.Dish;
 import com.swd392.group2.kgrill_model.model.Package;
 import com.swd392.group2.kgrill_model.model.PackageDish;
+import com.swd392.group2.kgrill_model.repository.DishRepository;
 import com.swd392.group2.kgrill_model.repository.PackageDishRepository;
 import com.swd392.group2.kgrill_model.repository.PackageRepository;
+import com.swd392.group2.kgrill_service.dto.PackageDishDto;
 import com.swd392.group2.kgrill_service.dto.request.PackageRequest;
 import com.swd392.group2.kgrill_service.dto.response.PackageDetailResponseForMobile;
 import com.swd392.group2.kgrill_service.dto.response.PackageResponseForAdminAndManager;
 import com.swd392.group2.kgrill_service.dto.mobiledto.PackageDishDtoOnMobile;
 import com.swd392.group2.kgrill_service.dto.response.PackageResponseForMobileAsList;
+import com.swd392.group2.kgrill_service.exception.DishNotFoundException;
 import com.swd392.group2.kgrill_service.exception.PackageNotFoundException;
 import com.swd392.group2.kgrill_service.service.PackageService;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +22,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -27,6 +32,7 @@ public class PackageImplement implements PackageService {
 
     private final PackageRepository packageRepository;
     private final PackageDishRepository packageDishRepository;
+    private final DishRepository dishRepository;
 
     public static String generatePackageCode(int packageNumber) {
         String prefix = "FP-";
@@ -36,7 +42,20 @@ public class PackageImplement implements PackageService {
 
     @Override
     public void addPackage(PackageRequest pkgRequest) {
+        List<PackageDishDto> pkgDishDtoList = pkgRequest.getPackageDishList();
         Package pkg = mapToPackage(pkgRequest);
+        List<PackageDish> pkgDishList = new ArrayList<>();
+        for (PackageDishDto pkgDishDto : pkgDishDtoList) {
+            Dish dish = dishRepository.findById(pkgDishDto.getId()).orElseThrow(() -> new DishNotFoundException("Dish could not be found"));
+            PackageDish pkgDish = new PackageDish();
+            pkgDish.setId(dish.getId());
+            pkgDish.setDishPrice(dish.getPrice());
+            pkgDish.setPackageEntity(pkg);
+            pkgDish.setQuantity(pkgDishDto.getQuantity());
+            pkgDish.setDish(dish);
+            pkgDishList.add(pkgDish);
+        }
+        pkg.setPackageDishes(pkgDishList);
         Package savedPackage = packageRepository.save(pkg);
         savedPackage.setCode(generatePackageCode(savedPackage.getId()));
         packageRepository.save(savedPackage);
@@ -44,7 +63,20 @@ public class PackageImplement implements PackageService {
 
     @Override
     public void updatePackage(PackageRequest pkgRequest) {
+        List<PackageDishDto> pkgDishDtoList = pkgRequest.getPackageDishList();
         Package pkg = mapToPackage(pkgRequest);
+        List<PackageDish> pkgDishList = new ArrayList<>();
+        for (PackageDishDto pkgDishDto : pkgDishDtoList) {
+            Dish dish = dishRepository.findById(pkgDishDto.getId()).orElseThrow(() -> new DishNotFoundException("Dish could not be found"));
+            PackageDish pkgDish = new PackageDish();
+            pkgDish.setId(dish.getId());
+            pkgDish.setDishPrice(dish.getPrice());
+            pkgDish.setPackageEntity(pkg);
+            pkgDish.setQuantity(pkgDishDto.getQuantity());
+            pkgDish.setDish(dish);
+            pkgDishList.add(pkgDish);
+        }
+        pkg.setPackageDishes(pkgDishList);
         packageRepository.save(pkg);
     }
 
@@ -87,22 +119,23 @@ public class PackageImplement implements PackageService {
 
     private PackageResponseForAdminAndManager mapToPackageResponseForAdminAndManager(Package pkg) {
         return PackageResponseForAdminAndManager.builder()
-            .id(pkg.getId())
-            .name(pkg.getName())
-            .code(pkg.getCode())
-            .price(pkg.getPrice())
-            .active(pkg.isActive())
-            .thumbnail(pkg.getThumbnail())
-            .build();
+                .id(pkg.getId())
+                .name(pkg.getName())
+                .code(pkg.getCode())
+                .description(pkg.getDescription())
+                .price(pkg.getPrice())
+                .active(pkg.isActive())
+                .thumbnail(pkg.getThumbnail())
+                .build();
     }
 
     private PackageResponseForMobileAsList mapToPackageResponseForMobileAsList(Package pkg) {
         return PackageResponseForMobileAsList.builder()
-            .id(pkg.getId())
-            .name(pkg.getName())
-            .price(pkg.getPrice())
-            .thumbnail(pkg.getThumbnail())
-            .build();
+                .id(pkg.getId())
+                .name(pkg.getName())
+                .price(pkg.getPrice())
+                .thumbnail(pkg.getThumbnail())
+                .build();
     }
 
     public PackageDishDtoOnMobile mapToPackageDishDtoOnMobile(PackageDish packageDish) {
@@ -128,12 +161,13 @@ public class PackageImplement implements PackageService {
 
     private Package mapToPackage(PackageRequest pkgRequest) {
         return Package.builder()
-            .id(pkgRequest.getId())
-            .name(pkgRequest.getName())
-            .description(pkgRequest.getDescription())
-            .price(pkgRequest.getPrice())
-            .active(pkgRequest.isActive())
-            .thumbnail(pkgRequest.getThumbnail())
-            .build();
+                .id(pkgRequest.getId())
+                .name(pkgRequest.getName())
+                .description(pkgRequest.getDescription())
+                .code(pkgRequest.getCode())
+                .price(pkgRequest.getPrice())
+                .active(pkgRequest.isActive())
+                .thumbnail(pkgRequest.getThumbnail())
+                .build();
     }
 }
