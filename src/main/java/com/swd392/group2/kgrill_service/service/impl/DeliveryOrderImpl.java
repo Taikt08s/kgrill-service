@@ -5,17 +5,16 @@ import com.swd392.group2.kgrill_model.model.Package;
 import com.swd392.group2.kgrill_model.repository.*;
 import com.swd392.group2.kgrill_service.dto.*;
 import com.swd392.group2.kgrill_service.exception.CustomSuccessHandler;
-import com.swd392.group2.kgrill_service.exception.ResourceNotFoundException;
 import com.swd392.group2.kgrill_service.service.DeliveryOrderService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import javax.swing.text.html.parser.Entity;
@@ -99,8 +98,7 @@ public class DeliveryOrderImpl implements DeliveryOrderService {
         Sort sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
         Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
 
-        Page<DeliveryOrder> deliveryOrderPage = deliveryOrderRepository.getDeliveryOrderByDateIncludingCurrentDay(pageable, startDate);
-        List<DeliveryOrder> deliveryOrders = deliveryOrderPage.getContent();
+        List<DeliveryOrder> deliveryOrders = deliveryOrderRepository.getDeliveryOrder(startDate);
         Map<Object, List<DeliveryOrder>> groupedList = groupByPeriod(deliveryOrders, period);
 
         List<RevenueElementResponse> content = new ArrayList<>();
@@ -155,10 +153,13 @@ public class DeliveryOrderImpl implements DeliveryOrderService {
             content.sort(Comparator.comparing(RevenueElementResponse::getOrderDate));
         }
 
+        Page<RevenueElementResponse> deliveryOrderPage =  convertListToPage(content, pageable);
+        List<RevenueElementResponse> contentList = deliveryOrderPage.getContent();
+
         RevenueResponse revenueResponse = new RevenueResponse();
-        revenueResponse.setContent(content);
-        revenueResponse.setPageNo(pageable.getPageNumber());
-        revenueResponse.setPageSize(pageable.getPageSize());
+        revenueResponse.setContent(contentList);
+        revenueResponse.setPageNo(deliveryOrderPage.getNumber());
+        revenueResponse.setPageSize(deliveryOrderPage.getSize());
         revenueResponse.setTotalElements(deliveryOrderPage.getTotalElements());
         revenueResponse.setTotalPages(deliveryOrderPage.getTotalPages());
         revenueResponse.setLast(deliveryOrderPage.isLast());
@@ -171,7 +172,7 @@ public class DeliveryOrderImpl implements DeliveryOrderService {
         Sort sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
         Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
 
-        Page<DeliveryOrder> deliveryOrderPage = deliveryOrderRepository.getDeliveryOrderByDateIncludingCurrentDay(pageable, startDate);
+        Page<DeliveryOrder> deliveryOrderPage = deliveryOrderRepository.getDeliveryOrder(pageable, startDate);
 
 //        if (period.equalsIgnoreCase("yearly")) {
 //            deliveryOrderPage = deliveryOrderRepository.getDeliveryOrderByYearly(pageable);
@@ -289,5 +290,12 @@ public class DeliveryOrderImpl implements DeliveryOrderService {
         }
 
         return date;
+    }
+
+    private Page<RevenueElementResponse> convertListToPage(List<RevenueElementResponse> content, Pageable pageable) {
+        int start = (int) pageable.getOffset();
+        int end = Math.min((start + pageable.getPageSize()), content.size());
+        List<RevenueElementResponse> subList = content.subList(start, end);
+        return new PageImpl<>(subList, pageable, content.size());
     }
 }
