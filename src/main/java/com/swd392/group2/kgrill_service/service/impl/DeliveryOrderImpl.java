@@ -5,6 +5,7 @@ import com.swd392.group2.kgrill_model.model.Package;
 import com.swd392.group2.kgrill_model.repository.*;
 import com.swd392.group2.kgrill_service.dto.*;
 import com.swd392.group2.kgrill_service.exception.CustomSuccessHandler;
+import com.swd392.group2.kgrill_service.exception.ResourceNotFoundException;
 import com.swd392.group2.kgrill_service.service.DeliveryOrderService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -15,6 +16,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import javax.swing.text.html.parser.Entity;
@@ -147,12 +149,6 @@ public class DeliveryOrderImpl implements DeliveryOrderService {
             content.add(revenueElementResponse);
         }
 
-        if (sortDir.equalsIgnoreCase("asc")) {
-            content.sort(Comparator.comparing(RevenueElementResponse::getOrderDate).reversed());
-        } else {
-            content.sort(Comparator.comparing(RevenueElementResponse::getOrderDate));
-        }
-
         Page<RevenueElementResponse> deliveryOrderPage =  convertListToPage(content, pageable);
         List<RevenueElementResponse> contentList = deliveryOrderPage.getContent();
 
@@ -172,75 +168,56 @@ public class DeliveryOrderImpl implements DeliveryOrderService {
         Sort sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
         Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
 
-        Page<DeliveryOrder> deliveryOrderPage = deliveryOrderRepository.getDeliveryOrder(pageable, startDate);
+        Page<DeliveryOrder> deliveryOrderPage = deliveryOrderRepository.getDeliveryOrderByDaily(pageable, startDate);
 
-//        if (period.equalsIgnoreCase("yearly")) {
-//            deliveryOrderPage = deliveryOrderRepository.getDeliveryOrderByYearly(pageable);
-//        } else if (period.equalsIgnoreCase("monthly")) {
-//            deliveryOrderPage = deliveryOrderRepository.getDeliveryOrderByMonthly(pageable);
-//        }
+        if (period.equalsIgnoreCase("yearly")) {
+            deliveryOrderPage = deliveryOrderRepository.getDeliveryOrderByYear(pageable, startDate.getYear());
+        } else if (period.equalsIgnoreCase("monthly")) {
+            deliveryOrderPage = deliveryOrderRepository.getDeliveryOrderByMonth(pageable, startDate.getYear(), startDate.getMonthValue());
+        }
 
         List<DeliveryOrder> deliveryOrders = deliveryOrderPage.getContent();
-        List<RevenueDetailResponse> content = deliveryOrders.stream()
-                .map(deliveryOrder -> modelMapper.map(deliveryOrder, RevenueDetailResponse.class))
+        List<RevenueDetailElementResponse> content = deliveryOrders.stream()
+                .map(deliveryOrder -> modelMapper.map(deliveryOrder, RevenueDetailElementResponse.class))
                 .collect(Collectors.toList());
 
-        float totalPrice = 0;
-        float completedOrder = 0;
-        float cancelledOrder = 0;
         //Lặp qua từng delivery order để lấy ra các package name
-        for (RevenueDetailResponse d : content) {
-//            //Lấy ra các package name, total price
-//            List<String> packageName = new ArrayList<>();
-//            float deliveryOrderPrice = 0;
-//            List<OrderDetail> orderDetails = orderDetailRepository.findByDeliveryOrderId(d.getId());
-//            for (OrderDetail o : orderDetails) {
-//                if (Objects.equals(o.getOrder().getId(), d.getId())) {
-//                    deliveryOrderPrice += o.getComboPrice() * o.getQuantity();
-//                    packageName.add(o.getPackageEntity().getName());
-//                }
-//            }
-//            d.setOrderValue(deliveryOrderPrice);
-//            d.setPackageName(packageName);
-//
-//            //Lấy Username
-//            User users = userRepository.findById(d.getAccountId())
-//                    .orElseThrow(() -> new UsernameNotFoundException("User not found"));
-//            d.setUserName(users.getFirstName() + " " + users.getLastName());
-//
-//            //Lấy ShipperName
-//            Shipper shipper = shipperRepository.findById((long) d.getShipperId())
-//                    .orElseThrow(() -> new ResourceNotFoundException("Shipper", "id", String.valueOf(d.getShipperId())));
-//            User user = userRepository.findById(UUID.fromString(shipper.getUuid()))
-//                    .orElseThrow(() -> new ResourceNotFoundException("Shipper", "id", shipper.getUuid()));
-//            d.setShipperName(user.getFirstName() + " " + user.getLastName());
-//
-//            totalPrice += deliveryOrderPrice;
-//
-//            //Tính completed order và cancelled order
-//            if (d.getStatus().equals("Cancelled")) {
-//                List<OrderDetail> orders = orderDetailRepository.findByDeliveryOrderId(d.getId());
-//                for (OrderDetail o : orders) {
-//                    if (Objects.equals(o.getOrder().getId(), d.getId())) {
-//                        cancelledOrder += o.getComboPrice() * o.getQuantity();
-//                    }
-//                }
-//            }
+        for (RevenueDetailElementResponse d : content) {
+            //Lấy ra các package name
+            List<String> packageName = new ArrayList<>();
+            float deliveryOrderPrice = 0;
+            List<OrderDetail> orderDetails = orderDetailRepository.findByDeliveryOrderId(d.getId());
+            for (OrderDetail o : orderDetails) {
+                if (Objects.equals(o.getOrder().getId(), d.getId())) {
+                    deliveryOrderPrice += o.getComboPrice() * o.getQuantity();
+                    packageName.add(o.getPackageEntity().getName());
+                }
+            }
+            d.setOrderValue(deliveryOrderPrice);
+            d.setPackageName(packageName);
 
-            completedOrder = totalPrice - cancelledOrder;
+            //Lấy Username
+            User users = userRepository.findById(d.getAccountId())
+                    .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+            d.setUserName(users.getFirstName() + " " + users.getLastName());
+
+            //Lấy ShipperName
+            Shipper shipper = shipperRepository.findById((long) d.getShipperId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Shipper", "id", String.valueOf(d.getShipperId())));
+            User user = userRepository.findById(UUID.fromString(shipper.getUuid()))
+                    .orElseThrow(() -> new ResourceNotFoundException("Shipper", "id", shipper.getUuid()));
+            d.setShipperName(user.getFirstName() + " " + user.getLastName());
+
         }
 
 
-        RevenueResponse revenueResponse = new RevenueResponse();
-//        revenueResponse.setContent(content);
-//        revenueResponse.setPageNo(pageable.getPageNumber());
-//        revenueResponse.setPageSize(pageable.getPageSize());
-//        revenueResponse.setTotalElements(deliveryOrderPage.getTotalElements());
-//        revenueResponse.setTotalPages(deliveryOrderPage.getTotalPages());
-//        revenueResponse.setLast(deliveryOrderPage.isLast());
-//        revenueResponse.setTotalRevenue(totalPrice);
-//        revenueResponse.setCompletedOrder(completedOrder);
-//        revenueResponse.setCancelledOrder(cancelledOrder);
+        RevenueDetailResponse revenueResponse = new RevenueDetailResponse();
+        revenueResponse.setContent(content);
+        revenueResponse.setPageNo(pageable.getPageNumber());
+        revenueResponse.setPageSize(pageable.getPageSize());
+        revenueResponse.setTotalElements(deliveryOrderPage.getTotalElements());
+        revenueResponse.setTotalPages(deliveryOrderPage.getTotalPages());
+        revenueResponse.setLast(deliveryOrderPage.isLast());
 
         return CustomSuccessHandler.responseBuilder(HttpStatus.OK, "Successfully retrieved revenue by daily", revenueResponse);
 
@@ -293,9 +270,40 @@ public class DeliveryOrderImpl implements DeliveryOrderService {
     }
 
     private Page<RevenueElementResponse> convertListToPage(List<RevenueElementResponse> content, Pageable pageable) {
+        List<RevenueElementResponse> sortedContent = content.stream()
+                .sorted((e1, e2) -> {
+                    for (Sort.Order order : pageable.getSort()) {
+                        Comparator<RevenueElementResponse> comparator;
+
+                        switch (order.getProperty()) {
+                            case "totalRevenue":
+                                comparator = Comparator.comparing(RevenueElementResponse::getTotalRevenue);
+                                break;
+                            case "completedOrder":
+                                comparator = Comparator.comparing(RevenueElementResponse::getCompletedOrder);
+                                break;
+                            case "cancelledOrder":
+                                comparator = Comparator.comparing(RevenueElementResponse::getCancelledOrder);
+                                break;
+                            default:
+                                comparator = Comparator.comparing(RevenueElementResponse::getOrderDate);
+                        }
+
+                        if (order.getDirection().isDescending()) {
+                            comparator = comparator.reversed();
+                        }
+                        int comparison = comparator.compare(e1, e2);
+                        if (comparison != 0) {
+                            return comparison;
+                        }
+                    }
+                    return 0; // Nếu không có thuộc tính sắp xếp hoặc sắp xếp giống nhau
+                })
+                .collect(Collectors.toList());
+
         int start = (int) pageable.getOffset();
-        int end = Math.min((start + pageable.getPageSize()), content.size());
-        List<RevenueElementResponse> subList = content.subList(start, end);
-        return new PageImpl<>(subList, pageable, content.size());
+        int end = Math.min((start + pageable.getPageSize()), sortedContent.size());
+        List<RevenueElementResponse> subList = sortedContent.subList(start, end);
+        return new PageImpl<>(subList, pageable, sortedContent.size());
     }
 }
