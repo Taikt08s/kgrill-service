@@ -22,6 +22,12 @@ public class DishImplement implements DishService {
     public DishImplement(DishRepository dishRepository){
         this.dishRepository=dishRepository;
     }
+
+//    @Override
+//    public List<Dish> findByNameAndPrice(String keyword) {
+//
+//    }
+
     @Override
     public DishDTO createDish(DishDTO dishDTO) {
         Dish dish = new Dish();
@@ -84,12 +90,14 @@ public class DishImplement implements DishService {
     }
 
     @Override
-    public Page<DishDTO> searchDishByFilter(int pageNumber, int pageSize, String sortField, String sortDir) {
+    public Page<Dish> searchDishByFilter(int pageNumber, int pageSize, String sortField, String sortDir, String keyword) {
         Sort sort = Sort.by(sortField);
         sort = sortDir.equals("asc") ? sort.ascending() : sort.descending();
         Pageable pageable = PageRequest.of(pageNumber - 1, pageSize, sort);
+        Page<Dish> dishes= dishRepository.findByNameAndPrice(keyword, pageable);
 
-        return null;
+        return dishes;
+
     }
 
     @Override
