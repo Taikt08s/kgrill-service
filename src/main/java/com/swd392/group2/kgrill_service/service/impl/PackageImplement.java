@@ -20,6 +20,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.access.method.P;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -48,7 +49,6 @@ public class PackageImplement implements PackageService {
         for (PackageDishDto pkgDishDto : pkgDishDtoList) {
             Dish dish = dishRepository.findById(pkgDishDto.getId()).orElseThrow(() -> new DishNotFoundException("Dish could not be found"));
             PackageDish pkgDish = new PackageDish();
-            pkgDish.setId(dish.getId());
             pkgDish.setDishPrice(dish.getPrice());
             pkgDish.setPackageEntity(pkg);
             pkgDish.setQuantity(pkgDishDto.getQuantity());
@@ -64,20 +64,47 @@ public class PackageImplement implements PackageService {
     @Override
     public void updatePackage(PackageRequest pkgRequest) {
         List<PackageDishDto> pkgDishDtoList = pkgRequest.getPackageDishList();
-        Package pkg = mapToPackage(pkgRequest);
-        List<PackageDish> pkgDishList = new ArrayList<>();
+        Package updatedPackage = mapToPackage(pkgRequest);
+        Package existedPackage = packageRepository.findById(pkgRequest.getId()).orElseThrow(() -> new PackageNotFoundException("Package could not be found"));
+        updatedPackage.setCode(existedPackage.getCode());
+
+        List<Integer> existedPackageDishIdList = existedPackage.getPackageDishes()
+                .stream()
+                .map(PackageDish -> PackageDish.getDish().getId())
+                .toList();
+
+        List<Integer> newPackageDishIdList = pkgDishDtoList
+                .stream().map(PackageDishDto::getId)
+                .toList();
+
+        List<Integer> removePackageDishIdList = existedPackageDishIdList.stream()
+                .filter(existedPackageDishId -> !newPackageDishIdList.contains(existedPackageDishId))
+                .toList();
+
         for (PackageDishDto pkgDishDto : pkgDishDtoList) {
-            Dish dish = dishRepository.findById(pkgDishDto.getId()).orElseThrow(() -> new DishNotFoundException("Dish could not be found"));
-            PackageDish pkgDish = new PackageDish();
-            pkgDish.setId(dish.getId());
-            pkgDish.setDishPrice(dish.getPrice());
-            pkgDish.setPackageEntity(pkg);
-            pkgDish.setQuantity(pkgDishDto.getQuantity());
-            pkgDish.setDish(dish);
-            pkgDishList.add(pkgDish);
+            int existedDishIdPosition = existedPackageDishIdList.indexOf(pkgDishDto.getId());
+            if (existedDishIdPosition == -1) {
+                Dish dish = dishRepository.findById(pkgDishDto.getId()).orElseThrow(() -> new DishNotFoundException("Dish could not be found"));
+                PackageDish pkgDish = new PackageDish();
+                pkgDish.setDishPrice(dish.getPrice());
+                pkgDish.setPackageEntity(updatedPackage);
+                pkgDish.setQuantity(pkgDishDto.getQuantity());
+                pkgDish.setDish(dish);
+                updatedPackage.getPackageDishes().add(pkgDish);
+            }else {
+                int existedDishId = existedPackageDishIdList.get(existedDishIdPosition);
+                PackageDish pkgDish = packageDishRepository.findByPackageEntity_IdAndDish_Id(updatedPackage.getId(), existedDishId);
+                pkgDish.setQuantity(pkgDishDto.getQuantity());
+                updatedPackage.getPackageDishes().add(pkgDish);
+            }
         }
-        pkg.setPackageDishes(pkgDishList);
-        packageRepository.save(pkg);
+
+        for (Integer removePackageDishId : removePackageDishIdList) {
+            PackageDish pkgDish = packageDishRepository.findByPackageEntity_IdAndDish_Id(updatedPackage.getId(), removePackageDishId);
+            packageDishRepository.delete(pkgDish);
+        }
+
+        packageRepository.save(updatedPackage);
     }
 
     @Override
