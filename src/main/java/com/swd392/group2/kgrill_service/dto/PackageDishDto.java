@@ -17,6 +17,10 @@ public class PackageDishDto {
     @JsonProperty("dish_id")
     private Integer id;
 
+    @Schema(description = "Dish name", example = "1 phan bo Tailor")
+    @JsonProperty("dish_name")
+    private String name;
+
     @Schema(description = "Dish quantity", example = "1")
     @JsonProperty("dish_quantity")
     private Integer quantity;
