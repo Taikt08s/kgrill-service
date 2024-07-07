@@ -86,6 +86,13 @@ public class PackageImplement implements PackageService {
     }
 
     @Override
+    public PackageRequest getAPackageDetail(int pkgId) {
+        Package pkg = packageRepository.findById(pkgId).orElseThrow(() -> new PackageNotFoundException("Package could not be found"));
+        List<PackageDishDto> dishDtoList = pkg.getPackageDishes().stream().map(this::mapToPackageDishDto).toList();
+        return mapToPackageRequest(pkg, dishDtoList);
+    }
+
+    @Override
     public Page<PackageResponseForAdminAndManager> searchPackageByFilter(int pageNumber, int pageSize, String sortField, String sortDir) {
         Sort sort = Sort.by(sortField);
         sort = sortDir.equals("asc") ? sort.ascending() : sort.descending();
@@ -146,6 +153,14 @@ public class PackageImplement implements PackageService {
         return packageDishDtoOnMobile;
     }
 
+    public PackageDishDto mapToPackageDishDto(PackageDish packageDish) {
+        PackageDishDto packageDishDto = new PackageDishDto();
+        packageDishDto.setId(packageDish.getDish().getId());
+        packageDishDto.setName(packageDish.getDish().getName());
+        packageDishDto.setQuantity(packageDish.getQuantity());
+        return packageDishDto;
+    }
+
     public PackageDetailResponseForMobile mapToPackageDetailResponseForMobile(Package pkg, List<PackageDishDtoOnMobile> dishDtoList) {
         return PackageDetailResponseForMobile.builder()
                 .id(pkg.getId())
@@ -166,8 +181,25 @@ public class PackageImplement implements PackageService {
                 .description(pkgRequest.getDescription())
                 .code(pkgRequest.getCode())
                 .price(pkgRequest.getPrice())
+                .packageType(pkgRequest.getPackageType())
+                .packageSize(pkgRequest.getPackageSize())
                 .active(pkgRequest.isActive())
                 .thumbnail(pkgRequest.getThumbnail())
+                .build();
+    }
+
+    private PackageRequest mapToPackageRequest(Package pkg, List<PackageDishDto> dishDtoList) {
+        return PackageRequest.builder()
+                .id(pkg.getId())
+                .name(pkg.getName())
+                .description(pkg.getDescription())
+                .code(pkg.getCode())
+                .price(pkg.getPrice())
+                .packageType(pkg.getPackageType())
+                .packageSize(pkg.getPackageSize())
+                .active(pkg.isActive())
+                .packageDishList(dishDtoList)
+                .thumbnail(pkg.getThumbnail())
                 .build();
     }
 }
