@@ -65,9 +65,9 @@ public class PackageImplement implements PackageService {
     public void updatePackage(PackageRequest pkgRequest) {
         List<PackageDishDto> pkgDishDtoList = pkgRequest.getPackageDishList();
         Package updatedPackage = mapToPackage(pkgRequest);
-        updatedPackage.setPackageDishes(new ArrayList<PackageDish>());
         Package existedPackage = packageRepository.findById(pkgRequest.getId()).orElseThrow(() -> new PackageNotFoundException("Package could not be found"));
         updatedPackage.setCode(existedPackage.getCode());
+        updatedPackage.setOrderDetails(existedPackage.getOrderDetails());
 
         List<Integer> existedPackageDishIdList = existedPackage.getPackageDishes()
                 .stream()
@@ -160,7 +160,7 @@ public class PackageImplement implements PackageService {
                 .description(pkg.getDescription())
                 .price(pkg.getPrice())
                 .active(pkg.isActive())
-                .thumbnail(pkg.getThumbnail())
+                .thumbnailUrl(pkg.getThumbnailUrl())
                 .build();
     }
 
@@ -169,7 +169,7 @@ public class PackageImplement implements PackageService {
                 .id(pkg.getId())
                 .name(pkg.getName())
                 .price(pkg.getPrice())
-                .thumbnail(pkg.getThumbnail())
+                .thumbnailUrl(pkg.getThumbnailUrl())
                 .build();
     }
 
@@ -198,7 +198,7 @@ public class PackageImplement implements PackageService {
                 .packageDishes(dishDtoList)
                 .packageType(pkg.getPackageType())
                 .description(pkg.getDescription())
-                .thumbnail(pkg.getThumbnail())
+                .thumbnailUrl(pkg.getThumbnailUrl())
                 .build();
     }
 
@@ -209,10 +209,11 @@ public class PackageImplement implements PackageService {
                 .description(pkgRequest.getDescription())
                 .code(pkgRequest.getCode())
                 .price(pkgRequest.getPrice())
+                .packageDishes(new ArrayList<>())
                 .packageType(pkgRequest.getPackageType())
                 .packageSize(pkgRequest.getPackageSize())
                 .active(pkgRequest.isActive())
-                .thumbnail(pkgRequest.getThumbnail())
+                .thumbnailUrl(pkgRequest.getThumbnailUrl())
                 .build();
     }
 
@@ -227,7 +228,7 @@ public class PackageImplement implements PackageService {
                 .packageSize(pkg.getPackageSize())
                 .active(pkg.isActive())
                 .packageDishList(dishDtoList)
-                .thumbnail(pkg.getThumbnail())
+                .thumbnailUrl(pkg.getThumbnailUrl())
                 .build();
     }
 }
