@@ -41,8 +41,8 @@ public class PackageDetailResponseForMobile {
     private String packageSize;
 
     @Schema(description = "Package's thumbnail url")
-    @JsonProperty("package_thumbnail")
-    private String thumbnail;
+    @JsonProperty("package_thumbnail_Url")
+    private String thumbnailUrl;
 
     @Schema(description = "Package's dishes")
     @JsonProperty("dishes_of_package")
