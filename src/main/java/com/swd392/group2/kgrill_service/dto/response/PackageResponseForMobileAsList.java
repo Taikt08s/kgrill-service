@@ -26,6 +26,6 @@ public class PackageResponseForMobileAsList {
     private Float price;
 
     @Schema(description = "Package's thumbnail url")
-    @JsonProperty("package_thumbnail")
-    private String thumbnail;
+    @JsonProperty("package_thumbnail_url")
+    private String thumbnailUrl;
 }
