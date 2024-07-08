@@ -52,6 +52,7 @@ public class PackageRequest {
     @JsonProperty("package_dish_list")
     private List<PackageDishDto> packageDishList;
 
-    @JsonProperty("package_thumbnail")
-    private String thumbnail;
+    @Schema(description = "Package's thumbnail url")
+    @JsonProperty("package_thumbnail_url")
+    private String thumbnailUrl;
 }
