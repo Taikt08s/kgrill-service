@@ -38,6 +38,6 @@ public class PackageResponseForAdminAndManager {
     private boolean active;
 
     @Schema(description = "Package's thumbnail url")
-    @JsonProperty("package_thumbnail")
-    private String thumbnail;
+    @JsonProperty("package_thumbnail_url")
+    private String thumbnailUrl;
 }
