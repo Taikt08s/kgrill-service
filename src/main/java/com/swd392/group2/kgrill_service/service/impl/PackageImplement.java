@@ -65,6 +65,7 @@ public class PackageImplement implements PackageService {
     public void updatePackage(PackageRequest pkgRequest) {
         List<PackageDishDto> pkgDishDtoList = pkgRequest.getPackageDishList();
         Package updatedPackage = mapToPackage(pkgRequest);
+        updatedPackage.setPackageDishes(new ArrayList<PackageDish>());
         Package existedPackage = packageRepository.findById(pkgRequest.getId()).orElseThrow(() -> new PackageNotFoundException("Package could not be found"));
         updatedPackage.setCode(existedPackage.getCode());
 
