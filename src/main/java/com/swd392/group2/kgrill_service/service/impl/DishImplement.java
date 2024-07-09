@@ -65,13 +65,6 @@ public class DishImplement implements DishService {
         dish.setDishIngredients(dishIngredientList);
         dishRepository.save(dish);
     }
-
-//    @Override
-//    public List<DishDTO> getAllDish() {
-//        List<Dish> dishes = dishRepository.findAll();
-//        return dishes.stream().map(d -> mapToDto(d)).collect(Collectors.toList());
-//    }
-
     @Override
     public DishRequest getDishByID(int id) {
         Dish dish = dishRepository.findById(id).orElseThrow(()->new DishNotFoundException("Dish could not be found"));
@@ -150,11 +143,11 @@ public class DishImplement implements DishService {
         return dishes.map(this::mapToDto);
     }
     private DishDTO mapToDto(Dish dish){
-        DishDTO dishDTO = new DishDTO();
-        dishDTO.setId(dish.getId());
-        dishDTO.setName(dish.getName());
-        dishDTO.setPrice(dish.getPrice());
-        return dishDTO;
+        return DishDTO.builder()
+                .id(dish.getId())
+                .name(dish.getName())
+                .price(dish.getPrice())
+                .build();
     }
     private Dish mapToEntity(DishRequest dishRequest){
         return Dish.builder()
@@ -174,7 +167,7 @@ public class DishImplement implements DishService {
     }
     private DishIngredientDTO maptoDishIngredientDTO(DishIngredient dishIngredient){
         DishIngredientDTO dishIngredientDTO = new DishIngredientDTO();
-        dishIngredientDTO.setId(dishIngredient.getId());
+        dishIngredientDTO.setId(dishIngredient.getIngredient().getId());
         return dishIngredientDTO;
     }
 

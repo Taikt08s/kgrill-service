@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 public class CategoryDTO {
     @JsonProperty("category_id")
     private Integer id;
-    @Schema(description = "Dish's category", example = "Combo Bò nướng")
+    @Schema(description = "Dish's category", example = "Dĩa nấm")
     @JsonProperty("category_name")
     private String category;
 }

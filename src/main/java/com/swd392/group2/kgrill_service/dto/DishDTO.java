@@ -17,7 +17,7 @@ import java.util.List;
 public class DishDTO {
     @JsonProperty("dish_id")
     private Integer id;
-    @Schema(description = "Dish's name", example = "Combo Bò nướng")
+    @Schema(description = "Dish's name", example = "Bò Nam Phi")
     @JsonProperty("dish_name")
     private String name;
     @Schema(description = "Dish's price", example = "99000")
