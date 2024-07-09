@@ -1,19 +1,21 @@
 package com.swd392.group2.kgrill_service.service.impl;
 
 
-import com.swd392.group2.kgrill_model.model.Dish;
-import com.swd392.group2.kgrill_model.model.DishIngredient;
-import com.swd392.group2.kgrill_model.model.Ingredient;
+import com.swd392.group2.kgrill_model.model.*;
 import com.swd392.group2.kgrill_model.model.Package;
+import com.swd392.group2.kgrill_model.repository.DishCategoryRepository;
 import com.swd392.group2.kgrill_model.repository.DishIngredientRepository;
 import com.swd392.group2.kgrill_model.repository.DishRepository;
 import com.swd392.group2.kgrill_model.repository.IngredientRepository;
+import com.swd392.group2.kgrill_service.dto.CategoryDTO;
 import com.swd392.group2.kgrill_service.dto.DishDTO;
 import com.swd392.group2.kgrill_service.dto.DishIngredientDTO;
 import com.swd392.group2.kgrill_service.dto.PackageDishDto;
 import com.swd392.group2.kgrill_service.dto.request.DishRequest;
 import com.swd392.group2.kgrill_service.dto.request.PackageRequest;
+import com.swd392.group2.kgrill_service.exception.CategoryNotFoundException;
 import com.swd392.group2.kgrill_service.exception.DishNotFoundException;
+import com.swd392.group2.kgrill_service.exception.IngredientNotFoundException;
 import com.swd392.group2.kgrill_service.service.DishService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -30,14 +32,15 @@ public class DishImplement implements DishService {
     private DishRepository dishRepository;
     private IngredientRepository ingredientRepository;
     private DishIngredientRepository dishIngredientRepository;
+    private DishCategoryRepository dishCategoryRepository;
 
     @Autowired
-    public DishImplement(DishRepository dishRepository, IngredientRepository ingredientRepository, DishIngredientRepository dishIngredientRepository)
+    public DishImplement(DishRepository dishRepository, IngredientRepository ingredientRepository, DishIngredientRepository dishIngredientRepository, DishCategoryRepository dishCategoryRepository)
     {
         this.ingredientRepository = ingredientRepository;
         this.dishRepository=dishRepository;
         this.dishIngredientRepository= dishIngredientRepository;
-
+        this.dishCategoryRepository = dishCategoryRepository;
     }
 
 //    @Override
@@ -46,27 +49,21 @@ public class DishImplement implements DishService {
 //    }
 
     @Override
-    public DishRequest createDish(DishRequest dishRequest) {
+    public void createDish(DishRequest dishRequest) {
         List<DishIngredientDTO> dishIngredientDtoList = dishRequest.getDishIngredientList();
         Dish dish = mapToEntity(dishRequest);
         List<DishIngredient> dishIngredientList = new ArrayList<>();
+        DishCategory dc = dishCategoryRepository.findById(dishRequest.getCategory().getId()).orElseThrow(() -> new CategoryNotFoundException("Category could not be found"));
         for (DishIngredientDTO dishIngredientDTO : dishIngredientDtoList){
-            Ingredient in = ingredientRepository.findById(dishIngredientDTO.getId()).orElseThrow(() -> new DishNotFoundException("Ingredient could not be found"));
+            Ingredient in = ingredientRepository.findById(dishIngredientDTO.getId()).orElseThrow(() -> new IngredientNotFoundException("Ingredient could not be found"));
             DishIngredient dishIngredient = new DishIngredient();
-            dishIngredient.setId(in.getId());
             dishIngredient.setDish(dish);
             dishIngredient.setIngredient(in);
             dishIngredientList.add(dishIngredient);
-
         }
+        dish.setCategory(dc);
         dish.setDishIngredients(dishIngredientList);
-        Dish newDish = dishRepository.save(dish);
-//        DishDTO dishResponse = new DishDTO();
-//        dishResponse.setId(newDish.getId());
-//        dishResponse.setName(newDish.getName());
-//        dishResponse.setPrice(newDish.getPrice());
-
-        return mapToDishRequest(newDish, dishIngredientDtoList);
+        dishRepository.save(dish);
     }
 
 //    @Override
@@ -79,28 +76,51 @@ public class DishImplement implements DishService {
     public DishRequest getDishByID(int id) {
         Dish dish = dishRepository.findById(id).orElseThrow(()->new DishNotFoundException("Dish could not be found"));
         List<DishIngredientDTO> dishIngredientDTOList = dish.getDishIngredients().stream().map(this::maptoDishIngredientDTO).toList();
-//        List<PackageDishDto> dishDtoList = pkg.getPackageDishes().stream().map(this::mapToPackageDishDto).toList();
-//        return mapToPackageRequest(pkg, dishDtoList);
-
         return mapToDishRequest(dish, dishIngredientDTOList);
     }
 
     @Override
-    public DishRequest updateDish(DishRequest dishRequest, int id) {
+    public void updateDish(DishRequest dishRequest) {
         List<DishIngredientDTO> dishIngredientDtoList = dishRequest.getDishIngredientList();
-        Dish dish = mapToEntity(dishRequest);
-        List<DishIngredient> dishIngredientList = new ArrayList<>();
-        for (DishIngredientDTO dishIngredientDTO : dishIngredientDtoList){
-            Ingredient in = ingredientRepository.findById(dishIngredientDTO.getId()).orElseThrow(() -> new DishNotFoundException("Ingredient could not be found"));
-            DishIngredient dishIngredient = new DishIngredient();
-            dishIngredient.setId(in.getId());
-            dishIngredient.setDish(dish);
-            dishIngredient.setIngredient(in);
-            dishIngredientList.add(dishIngredient);
+        Dish updatedDish = mapToEntity(dishRequest);
+        Dish existedDish = dishRepository.findById(dishRequest.getId()).orElseThrow(() -> new DishNotFoundException("Dish could not be found"));
+
+        DishCategory dc = dishCategoryRepository.findById(dishRequest.getCategory().getId()).orElseThrow(() -> new CategoryNotFoundException("Category could not be found"));
+        updatedDish.setCategory(dc);
+        List<Integer> existedDishIngredientIdInList = existedDish.getDishIngredients()
+                .stream()
+                .map(DishIngredient -> DishIngredient.getIngredient().getId())
+                .toList();
+
+        List<Integer> newDishIngredientIdInList = dishIngredientDtoList
+                .stream().map(DishIngredientDTO::getId)
+                .toList();
+
+        List<Integer> removeDishIngredientIdInList = existedDishIngredientIdInList.stream()
+                .filter(existedDishIngredientId-> !newDishIngredientIdInList.contains(existedDishIngredientId))
+                .toList();
+        for (DishIngredientDTO dishIngredientDTO : dishIngredientDtoList) {
+            int existedIngredientIdPosition = existedDishIngredientIdInList.indexOf(dishIngredientDTO.getId());
+            if (existedIngredientIdPosition == -1) {
+                Ingredient in = ingredientRepository.findById(dishIngredientDTO.getId()).orElseThrow(() -> new IngredientNotFoundException("Ingredient could not be found"));
+                DishIngredient dishIngredient = new DishIngredient();
+                dishIngredient.setDish(updatedDish);
+                dishIngredient.setIngredient(in);
+                updatedDish.getDishIngredients().add(dishIngredient);
+            } else {
+                int existedIngredientId = existedDishIngredientIdInList.get(existedIngredientIdPosition);
+                DishIngredient dishIngredient = dishIngredientRepository.findByIngredient_IdAndDish_Id(existedIngredientId, updatedDish.getId());
+                updatedDish.getDishIngredients().add(dishIngredient);
+            }
+            for (Integer removeDishIngredientId : removeDishIngredientIdInList) {
+                DishIngredient dishIngredient = dishIngredientRepository.findByIngredient_IdAndDish_Id(removeDishIngredientId, updatedDish.getId());
+                dishIngredientRepository.delete(dishIngredient);
+            }
+
+
+            dishRepository.save(updatedDish);
         }
-        dish.setDishIngredients(dishIngredientList);
-        Dish updatedDish= dishRepository.save(dish);
-        return mapToDishRequest(updatedDish, dishIngredientDtoList);
+
 
     }
 
@@ -120,7 +140,6 @@ public class DishImplement implements DishService {
         return dishes;
 
     }
-
     @Override
     public Page<DishDTO> getAllDishes(int pageNumber, int pageSize, String sortField, String sortDir) {
         Sort sort = Sort.by(sortField);
@@ -130,7 +149,6 @@ public class DishImplement implements DishService {
         Page<Dish> dishes = dishRepository.findAll(pageable);
         return dishes.map(this::mapToDto);
     }
-
     private DishDTO mapToDto(Dish dish){
         DishDTO dishDTO = new DishDTO();
         dishDTO.setId(dish.getId());
@@ -139,10 +157,12 @@ public class DishImplement implements DishService {
         return dishDTO;
     }
     private Dish mapToEntity(DishRequest dishRequest){
-        Dish dish =new Dish();
-        dish.setName(dishRequest.getName());
-        dish.setPrice(dishRequest.getPrice());
-        return dish;
+        return Dish.builder()
+                .id(dishRequest.getId())
+                .name(dishRequest.getName())
+                .price(dishRequest.getPrice())
+                .dishIngredients(new ArrayList<>())
+                .build();
     }
     private DishRequest mapToDishRequest(Dish dish, List<DishIngredientDTO> ingredientDTOList) {
         return DishRequest.builder()
@@ -157,4 +177,5 @@ public class DishImplement implements DishService {
         dishIngredientDTO.setId(dishIngredient.getId());
         return dishIngredientDTO;
     }
+
 }
