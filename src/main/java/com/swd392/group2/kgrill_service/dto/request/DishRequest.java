@@ -1,6 +1,8 @@
 package com.swd392.group2.kgrill_service.dto.request;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.swd392.group2.kgrill_model.model.DishCategory;
+import com.swd392.group2.kgrill_service.dto.CategoryDTO;
 import com.swd392.group2.kgrill_service.dto.DishIngredientDTO;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
@@ -24,9 +26,9 @@ public class DishRequest {
     @Schema(description = "Dish's price", example = "99000")
     @JsonProperty("dish_price")
     private Float price;
-    @Schema(description = "Dish's category", example = "1 - 2 người")
+    @Schema(description = "Dish's category")
     @JsonProperty("dish_category")
-    private String dishCategory;
+    private CategoryDTO category;
     @Schema(description = "Dish's ingredient list")
     @JsonProperty("dish_ingredient_list")
     private List<DishIngredientDTO> dishIngredientList;
