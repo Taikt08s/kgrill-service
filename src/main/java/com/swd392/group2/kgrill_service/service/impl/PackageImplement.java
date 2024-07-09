@@ -169,6 +169,7 @@ public class PackageImplement implements PackageService {
                 .id(pkg.getId())
                 .name(pkg.getName())
                 .price(pkg.getPrice())
+                .packageType(pkg.getPackageType())
                 .thumbnailUrl(pkg.getThumbnailUrl())
                 .build();
     }
