@@ -149,6 +149,19 @@ public class GlobalExceptionHandler {
                                 .build()
                 );
     }
+    @ExceptionHandler(CategoryNotFoundException.class)
+    public ResponseEntity<ExceptionResponse> handleCategoryNotFoundException(IngredientNotFoundException ex, WebRequest request) {
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(
+                        ExceptionResponse.builder()
+                                .httpStatus(HttpStatus.NOT_FOUND.value())
+                                .timestamp(DateUtil.formatTimestamp(new Date()))
+                                .message("Not found")
+                                .error(ex.getMessage())
+                                .build()
+                );
+    }
 
     public ResponseEntity<ExceptionResponse> handleResourceNotFoundException(
             ResourceNotFoundException ex) {
