@@ -153,7 +153,7 @@ public class JwtImplement implements JwtService {
         return expirationTime.before(new Date());
     }
 
-    @Scheduled(cron = "0 */1 * * * *")
+    @Scheduled(cron = "0 0 3 * * *")
     public void scheduleDeleteExpiredToken() {
         tokenRepository.deleteTokensByRevokedTrueAndExpiredTrue();
     }

@@ -25,7 +25,11 @@ public class PackageResponseForMobileAsList {
     @JsonProperty("package_price")
     private Float price;
 
+    @Schema(description = "Package's type", example = "lẩu")
+    @JsonProperty("package_type")
+    private String packageType;
+
     @Schema(description = "Package's thumbnail url")
-    @JsonProperty("package_thumbnail")
-    private String thumbnail;
+    @JsonProperty("package_thumbnail_url")
+    private String thumbnailUrl;
 }

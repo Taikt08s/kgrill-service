@@ -25,7 +25,7 @@ public class PackageDetailResponseForMobile {
     private String name;
 
     @Schema(description = "Package's description", example = "Combo Bò nướng mĩ vị Tailor là combo phù hợp với ...")
-    @JsonProperty("package_code")
+    @JsonProperty("package_description")
     private String description;
 
     @Schema(description = "Package's price", example = "999000")
@@ -41,8 +41,8 @@ public class PackageDetailResponseForMobile {
     private String packageSize;
 
     @Schema(description = "Package's thumbnail url")
-    @JsonProperty("package_thumbnail")
-    private String thumbnail;
+    @JsonProperty("package_thumbnail_Url")
+    private String thumbnailUrl;
 
     @Schema(description = "Package's dishes")
     @JsonProperty("dishes_of_package")

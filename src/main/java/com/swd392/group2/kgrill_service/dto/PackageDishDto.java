@@ -7,20 +7,21 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
 @Builder
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Schema(description = "Response object for Dish to show in Dish list")
-public class DishDTO {
+@Schema(description = "Request object for Package's Dish")
+public class PackageDishDto {
+
     @JsonProperty("dish_id")
     private Integer id;
-    @Schema(description = "Dish's name", example = "Bò Nam Phi")
+
+    @Schema(description = "Dish name", example = "1 phan bo Tailor")
     @JsonProperty("dish_name")
     private String name;
-    @Schema(description = "Dish's price", example = "99000")
-    @JsonProperty("dish_price")
-    private Float price;
+
+    @Schema(description = "Dish quantity", example = "1")
+    @JsonProperty("dish_quantity")
+    private Integer quantity;
 }

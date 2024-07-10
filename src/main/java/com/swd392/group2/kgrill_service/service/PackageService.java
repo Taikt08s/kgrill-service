@@ -16,6 +16,8 @@ public interface PackageService{
 
     void deletePackageById(int id);
 
+    PackageRequest getAPackageDetail(int pkgId);
+
     Page<PackageResponseForAdminAndManager> searchPackageByFilter(int pageNumber, int pageSize, String sortField, String sortDir);
 
     Page<PackageResponseForAdminAndManager> getAllPackagePages(int pageNumber, int pageSize, String sortField, String sortDir);
