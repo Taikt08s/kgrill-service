@@ -22,6 +22,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.access.method.P;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -62,6 +63,7 @@ public class PackageImplement implements PackageService {
     }
 
     @Override
+    @Transactional
     public void updatePackage(PackageRequest pkgRequest) {
         List<PackageDishDto> pkgDishDtoList = pkgRequest.getPackageDishList();
         Package updatedPackage = mapToPackage(pkgRequest);
@@ -114,6 +116,7 @@ public class PackageImplement implements PackageService {
     }
 
     @Override
+    @Transactional
     public PackageRequest getAPackageDetail(int pkgId) {
         Package pkg = packageRepository.findById(pkgId).orElseThrow(() -> new PackageNotFoundException("Package could not be found"));
         List<PackageDishDto> dishDtoList = pkg.getPackageDishes().stream().map(this::mapToPackageDishDto).toList();
