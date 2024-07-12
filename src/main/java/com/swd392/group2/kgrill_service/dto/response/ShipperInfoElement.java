@@ -18,6 +18,9 @@ public class ShipperInfoElement {
     @Schema(description = "Shipper's ID", example = "1")
     private int id;
 
+    @Schema(description = "Shipper's UUID", example = "1")
+    private String uuid;
+
     @Schema(description = "Shipper's name", example = "Nguyễn Văn A")
     private String name;
 
