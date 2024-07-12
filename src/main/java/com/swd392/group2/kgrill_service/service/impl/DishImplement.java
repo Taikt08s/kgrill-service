@@ -17,6 +17,7 @@ import com.swd392.group2.kgrill_service.exception.CategoryNotFoundException;
 import com.swd392.group2.kgrill_service.exception.DishNotFoundException;
 import com.swd392.group2.kgrill_service.exception.IngredientNotFoundException;
 import com.swd392.group2.kgrill_service.service.DishService;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -66,6 +67,7 @@ public class DishImplement implements DishService {
         dishRepository.save(dish);
     }
     @Override
+    @Transactional
     public DishRequest getDishByID(int id) {
         Dish dish = dishRepository.findById(id).orElseThrow(()->new DishNotFoundException("Dish could not be found"));
         List<DishIngredientDTO> dishIngredientDTOList = dish.getDishIngredients().stream().map(this::maptoDishIngredientDTO).toList();
@@ -73,6 +75,7 @@ public class DishImplement implements DishService {
     }
 
     @Override
+    @Transactional
     public void updateDish(DishRequest dishRequest) {
         List<DishIngredientDTO> dishIngredientDtoList = dishRequest.getDishIngredientList();
         Dish updatedDish = mapToEntity(dishRequest);
