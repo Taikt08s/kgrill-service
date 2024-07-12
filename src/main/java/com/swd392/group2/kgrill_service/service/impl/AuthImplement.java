@@ -291,8 +291,6 @@ public class AuthImplement implements AuthService {
             userRepository.save(user);
         } else {
             user = optionalUser.get();
-            user.setFirstName(request.getFirstName());
-            user.setLastName(request.getLastName());
             user.setEmail(request.getEmail());
             userRepository.save(user);
         }
