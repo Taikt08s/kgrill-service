@@ -23,6 +23,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -66,6 +67,7 @@ public class DishImplement implements DishService {
         dishRepository.save(dish);
     }
     @Override
+    @Transactional
     public DishRequest getDishByID(int id) {
         Dish dish = dishRepository.findById(id).orElseThrow(()->new DishNotFoundException("Dish could not be found"));
         List<DishIngredientDTO> dishIngredientDTOList = dish.getDishIngredients().stream().map(this::maptoDishIngredientDTO).toList();
@@ -73,6 +75,7 @@ public class DishImplement implements DishService {
     }
 
     @Override
+    @Transactional
     public void updateDish(DishRequest dishRequest) {
         List<DishIngredientDTO> dishIngredientDtoList = dishRequest.getDishIngredientList();
         Dish updatedDish = mapToEntity(dishRequest);
