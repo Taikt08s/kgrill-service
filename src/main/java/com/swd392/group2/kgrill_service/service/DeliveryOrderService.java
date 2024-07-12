@@ -18,6 +18,7 @@ public interface DeliveryOrderService {
 
     ResponseEntity<Object> getRevenueByPeriod(int pageNo, int pageSize, String sortBy, String sortDir, String period, LocalDate startDate);
 
-    ResponseEntity<Object> getRevenueDetailByPeriod(int pageNo, int pageSize, String sortBy, String sortDir, String period, LocalDate startDate);
+    ResponseEntity<Object> getDeliveryOrderDetailByAdmin(int pageNo, int pageSize, String sortBy, String sortDir, String period, LocalDate startDate);
 
+    ResponseEntity<Object> getDeliveryOrderDetailByShipperId(int pageNo, int pageSize, String sortBy, String sortDir, int shipperId);
 }

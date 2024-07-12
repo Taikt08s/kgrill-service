@@ -164,7 +164,7 @@ public class DeliveryOrderImpl implements DeliveryOrderService {
     }
 
     @Override
-    public ResponseEntity<Object> getRevenueDetailByPeriod(int pageNo, int pageSize, String sortBy, String sortDir, String period, LocalDate startDate) {
+    public ResponseEntity<Object> getDeliveryOrderDetailByAdmin(int pageNo, int pageSize, String sortBy, String sortDir, String period, LocalDate startDate) {
         Sort sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
         Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
 
@@ -175,6 +175,24 @@ public class DeliveryOrderImpl implements DeliveryOrderService {
         } else if (period.equalsIgnoreCase("monthly")) {
             deliveryOrderPage = deliveryOrderRepository.getDeliveryOrderByMonth(pageable, startDate.getYear(), startDate.getMonthValue());
         }
+
+        RevenueDetailResponse revenueResponse = extractDeliveryOrderDetail(deliveryOrderPage,pageable);
+       return CustomSuccessHandler.responseBuilder(HttpStatus.OK, "Successfully retrieved revenue by daily", revenueResponse);
+    }
+
+    @Override
+    public ResponseEntity<Object> getDeliveryOrderDetailByShipperId(int pageNo, int pageSize, String sortBy, String sortDir, int shipperId){
+        Sort sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
+        Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
+
+        Page<DeliveryOrder> deliveryOrderPage = deliveryOrderRepository.getByShipperId(shipperId, pageable);
+
+        RevenueDetailResponse revenueResponse = extractDeliveryOrderDetail(deliveryOrderPage,pageable);
+
+        return CustomSuccessHandler.responseBuilder(HttpStatus.OK, "Successfully retrieved Delivery Order Detail by shipper", revenueResponse);
+    }
+
+    public RevenueDetailResponse extractDeliveryOrderDetail(Page<DeliveryOrder> deliveryOrderPage,  Pageable pageable){
 
         List<DeliveryOrder> deliveryOrders = deliveryOrderPage.getContent();
         List<RevenueDetailElementResponse> content = deliveryOrders.stream()
@@ -209,8 +227,6 @@ public class DeliveryOrderImpl implements DeliveryOrderService {
             d.setShipperName(user.getFirstName() + " " + user.getLastName());
 
         }
-
-
         RevenueDetailResponse revenueResponse = new RevenueDetailResponse();
         revenueResponse.setContent(content);
         revenueResponse.setPageNo(pageable.getPageNumber());
@@ -219,8 +235,8 @@ public class DeliveryOrderImpl implements DeliveryOrderService {
         revenueResponse.setTotalPages(deliveryOrderPage.getTotalPages());
         revenueResponse.setLast(deliveryOrderPage.isLast());
 
-        return CustomSuccessHandler.responseBuilder(HttpStatus.OK, "Successfully retrieved revenue by daily", revenueResponse);
 
+        return  revenueResponse;
     }
 
     public Map<Object, List<DeliveryOrder>> groupByPeriod(List<DeliveryOrder> deliveryOrders, String period) {
@@ -268,7 +284,6 @@ public class DeliveryOrderImpl implements DeliveryOrderService {
 
         return date;
     }
-
 
     private Page<RevenueElementResponse> convertListToPage(List<RevenueElementResponse> content, Pageable pageable) {
         List<RevenueElementResponse> sortedContent = content.stream()
