@@ -24,11 +24,11 @@ public class UserProfileDto {
     private UUID id;
 
     @Schema(description = "User's first name", example = "Dang Dinh")
-    @NotBlank(message = "First name cannot be blank")
+    @JsonProperty("first_name")
     private String firstName;
 
     @Schema(description = "User's last name", example = "Tai")
-    @NotBlank(message = "Last name cannot be blank")
+    @JsonProperty("last_name")
     private String lastName;
 
     @Schema(description = "User's address", example = "123 Main St, Springfield")
