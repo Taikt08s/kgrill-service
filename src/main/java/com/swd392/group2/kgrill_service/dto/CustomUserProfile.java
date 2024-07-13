@@ -7,6 +7,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import lombok.*;
 
+import java.time.LocalDate;
 import java.util.UUID;
 
 @Getter
@@ -66,7 +67,7 @@ public class CustomUserProfile {
 
     @Schema(description = "User's date of birth", example = "26-10-2003")
     @JsonProperty(value = "dob", index = 13)
-    private String dob;
+    private LocalDate dob;
 
 
 }

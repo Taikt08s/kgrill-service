@@ -10,6 +10,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
 import java.util.UUID;
 
 @Data
@@ -45,7 +46,7 @@ public class UserProfileDto {
     private String gender;
 
     @Schema(description = "User's date of birth", example = "26-10-2003")
-    private String dob;
+    private LocalDate dob;
 
     @Schema(description = "User's phone number", example = "(+84)877643231")
     @NotBlank(message = "Phone number cannot be blank")
