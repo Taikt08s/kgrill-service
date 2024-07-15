@@ -169,31 +169,14 @@ public class UserImplement implements UserService {
     public UserProfileDto updateUserInformation(UUID id, UserProfileDto userProfileDto) {
         User user = userRepository.findById(id).orElse(null);
         if (user != null) {
-            if (userProfileDto.getFirstName() != null) {
-                user.setFirstName(userProfileDto.getFirstName());
-            }
-            if (userProfileDto.getLastName() != null) {
-                user.setLastName(userProfileDto.getLastName());
-            }
-            if (userProfileDto.getAddress() != null) {
-                user.setAddress(userProfileDto.getAddress());
-            }
-
-            if (userProfileDto.getLatitude() != null) {
-                user.setLatitude(userProfileDto.getLatitude());
-            }
-
-            if (userProfileDto.getLongitude() != null) {
-                user.setLongitude(userProfileDto.getLongitude());
-            }
-
-            if (userProfileDto.getGender() != null) {
-                user.setGender(userProfileDto.getGender());
-            }
-
-            if (userProfileDto.getPhone() != null) {
-                user.setPhone(userProfileDto.getPhone());
-            }
+            user.setFirstName(userProfileDto.getFirstName());
+            user.setLastName(userProfileDto.getLastName());
+            user.setAddress(userProfileDto.getAddress());
+            user.setGender(userProfileDto.getGender());
+            user.setDob(userProfileDto.getDob());
+            user.setPhone(userProfileDto.getPhone());
+            user.setLatitude(userProfileDto.getLatitude());
+            user.setLongitude(userProfileDto.getLongitude());
             User updateUser = userRepository.save(user);
             return mapToUserProfileDto(updateUser);
         } else {

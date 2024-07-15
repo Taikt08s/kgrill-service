@@ -10,6 +10,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
 import java.util.UUID;
 
 @Data
@@ -24,12 +25,10 @@ public class UserProfileDto {
     private UUID id;
 
     @Schema(description = "User's first name", example = "Dang Dinh")
-    @NotBlank(message = "First name cannot be blank")
     @JsonProperty("first_name")
     private String firstName;
 
     @Schema(description = "User's last name", example = "Tai")
-    @NotBlank(message = "Last name cannot be blank")
     @JsonProperty("last_name")
     private String lastName;
 
@@ -47,7 +46,7 @@ public class UserProfileDto {
     private String gender;
 
     @Schema(description = "User's date of birth", example = "26-10-2003")
-    private String dob;
+    private LocalDate dob;
 
     @Schema(description = "User's phone number", example = "(+84)877643231")
     @NotBlank(message = "Phone number cannot be blank")
