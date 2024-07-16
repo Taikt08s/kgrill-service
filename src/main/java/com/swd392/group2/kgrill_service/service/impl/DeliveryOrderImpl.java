@@ -4,6 +4,8 @@ import com.swd392.group2.kgrill_model.model.*;
 import com.swd392.group2.kgrill_model.model.Package;
 import com.swd392.group2.kgrill_model.repository.*;
 import com.swd392.group2.kgrill_service.dto.*;
+import com.swd392.group2.kgrill_service.dto.response.DeliveryOrderElement;
+import com.swd392.group2.kgrill_service.dto.response.DeliveryOrderForManager;
 import com.swd392.group2.kgrill_service.exception.CustomSuccessHandler;
 import com.swd392.group2.kgrill_service.exception.ResourceNotFoundException;
 import com.swd392.group2.kgrill_service.service.DeliveryOrderService;
@@ -192,7 +194,55 @@ public class DeliveryOrderImpl implements DeliveryOrderService {
         return CustomSuccessHandler.responseBuilder(HttpStatus.OK, "Successfully retrieved Delivery Order Detail by shipper", revenueResponse);
     }
 
-    public RevenueDetailResponse extractDeliveryOrderDetail(Page<DeliveryOrder> deliveryOrderPage,  Pageable pageable){
+    @Override
+    public ResponseEntity<Object> getDeliveryOrderByStatus(int pageNo, int pageSize, String sortBy, String sortDir, String status) {
+        Sort sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
+        Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
+
+        Page<DeliveryOrder> deliveryOrderPage = deliveryOrderRepository.getDeliveryOrderByStatus(status, pageable);
+        List<DeliveryOrder> deliveryOrders = deliveryOrderPage.getContent();
+
+        List<DeliveryOrderElement> content = deliveryOrders.stream()
+                .map(deliveryOrder -> modelMapper.map(deliveryOrder, DeliveryOrderElement.class))
+                .collect(Collectors.toList());
+
+        for (DeliveryOrderElement d : content) {
+            List<String> packageName = new ArrayList<>();
+            float deliveryOrderPrice = 0;
+            List<OrderDetail> orderDetails = orderDetailRepository.findOrderDetailByOrderId(d.getId());
+
+            //tính tiền
+            for (OrderDetail o : orderDetails) {
+                if (Objects.equals(o.getOrder().getId(), d.getId())) {
+                    deliveryOrderPrice += o.getComboPrice() * o.getQuantity();
+                    packageName.add(o.getPackageEntity().getName());
+                }
+            }
+            d.setOrderValue(deliveryOrderPrice);
+            d.setPackageName(packageName);
+
+            //Lấy Username
+            User users = userRepository.findById(d.getAccountId())
+                    .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+            d.setUserName(users.getFirstName() + " " + users.getLastName());
+            d.setPhone(users.getPhone());
+            d.setAddress(users.getAddress());
+
+        }
+
+
+        DeliveryOrderForManager deliveryOrderForManager = new DeliveryOrderForManager();
+        deliveryOrderForManager.setContent(content);
+        deliveryOrderForManager.setTotalPages(deliveryOrderPage.getTotalPages());
+        deliveryOrderForManager.setTotalElements(deliveryOrderPage.getTotalElements());
+        deliveryOrderForManager.setPageNo(deliveryOrderPage.getNumber());
+        deliveryOrderForManager.setPageSize(deliveryOrderPage.getSize());
+        deliveryOrderForManager.setLast(deliveryOrderPage.isLast());
+
+        return CustomSuccessHandler.responseBuilder(HttpStatus.OK, "Successfully retrieved User's ordering for Manager ", deliveryOrderForManager);
+    }
+
+    private RevenueDetailResponse extractDeliveryOrderDetail(Page<DeliveryOrder> deliveryOrderPage,  Pageable pageable){
 
         List<DeliveryOrder> deliveryOrders = deliveryOrderPage.getContent();
         List<RevenueDetailElementResponse> content = deliveryOrders.stream()
@@ -204,7 +254,7 @@ public class DeliveryOrderImpl implements DeliveryOrderService {
             //Lấy ra các package name
             List<String> packageName = new ArrayList<>();
             float deliveryOrderPrice = 0;
-            List<OrderDetail> orderDetails = orderDetailRepository.findByDeliveryOrderId(d.getId());
+            List<OrderDetail> orderDetails = orderDetailRepository.findOrderDetailByOrderId(d.getId());
             for (OrderDetail o : orderDetails) {
                 if (Objects.equals(o.getOrder().getId(), d.getId())) {
                     deliveryOrderPrice += o.getComboPrice() * o.getQuantity();
@@ -239,7 +289,7 @@ public class DeliveryOrderImpl implements DeliveryOrderService {
         return  revenueResponse;
     }
 
-    public Map<Object, List<DeliveryOrder>> groupByPeriod(List<DeliveryOrder> deliveryOrders, String period) {
+    private Map<Object, List<DeliveryOrder>> groupByPeriod(List<DeliveryOrder> deliveryOrders, String period) {
 
         Map<Object, List<DeliveryOrder>> groupedList = deliveryOrders.stream()
                 .collect(Collectors.groupingBy(deliveryOrder ->
@@ -261,7 +311,7 @@ public class DeliveryOrderImpl implements DeliveryOrderService {
         return groupedList;
     }
 
-    public String getDateTimeFormatter(Object mapKey, String period){
+    private String getDateTimeFormatter(Object mapKey, String period){
         String date;
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");

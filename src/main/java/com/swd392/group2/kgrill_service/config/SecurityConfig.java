@@ -36,6 +36,7 @@ public class SecurityConfig {
                 .cors(withDefaults())
                 .authorizeHttpRequests(request -> request.requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/auth/**").permitAll()
                         .requestMatchers("/account/**", "/mobile/food-package/**").hasAuthority("USER")
+                        .requestMatchers("/delivery-order/ordering").hasAuthority("MANAGER")
                         .requestMatchers("/admin/**").hasAuthority("ADMIN")
                         .requestMatchers("/dish/**", "/ingredient/**").hasAuthority("MANAGER")
                         .requestMatchers("/food-package/**").hasAnyAuthority("MANAGER", "ADMIN")
