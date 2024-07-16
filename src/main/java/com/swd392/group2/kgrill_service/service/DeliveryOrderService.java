@@ -21,4 +21,6 @@ public interface DeliveryOrderService {
     ResponseEntity<Object> getDeliveryOrderDetailByAdmin(int pageNo, int pageSize, String sortBy, String sortDir, String period, LocalDate startDate);
 
     ResponseEntity<Object> getDeliveryOrderDetailByShipperId(int pageNo, int pageSize, String sortBy, String sortDir, int shipperId);
+
+    ResponseEntity<Object> getDeliveryOrderByStatus(int pageNo, int pageSize, String sortBy, String sortDir, String status);
 }
