@@ -20,7 +20,7 @@ import java.util.List;
 public class DeliveryOrderDto {
 
     @JsonProperty("delivery_order_id")
-    private Integer id;
+    private Integer orderId;
 
     @JsonProperty("order_date")
     private Date orderDate;
@@ -35,7 +35,7 @@ public class DeliveryOrderDto {
     private String shippedAddress;
 
     @JsonProperty("shipping_fee")
-    private Float shippingFee;
+    private Long shippingFee;
 
     @JsonProperty("order_status")
     private String status;
