@@ -129,6 +129,24 @@ public class DeliveryOrderImpl implements DeliveryOrderService {
         return CustomSuccessHandler.responseBuilder(HttpStatus.OK, "Successfully retrieved order count", orderCountResponse);
     }
 
+    @Override
+    public ResponseEntity<Object> cancelOrderForManager(Long orderId) {
+        DeliveryOrder deliveryOrder = deliveryOrderRepository.findById(orderId).orElseThrow(() -> new RuntimeException("User not found"));
+
+        if (deliveryOrder.getStatus() != null) {
+            if (deliveryOrder.getStatus().equalsIgnoreCase("Delivered")) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Order is being delivered and cannot be cancelled");
+            }else if(deliveryOrder.getStatus().equalsIgnoreCase("Cancelled")){
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Order cancelled already");
+            }else {
+                deliveryOrder.setStatus("Cancelled");
+                deliveryOrderRepository.save(deliveryOrder);
+                return CustomSuccessHandler.responseBuilder(HttpStatus.OK, "Cancel order successfully", "");
+            }
+        }
+        return null;
+    }
+
 
     @Override
     public ResponseEntity<Object> getRevenueByPeriod(int pageNo, int pageSize, String sortBy, String sortDir, String period, LocalDate startDate) {
