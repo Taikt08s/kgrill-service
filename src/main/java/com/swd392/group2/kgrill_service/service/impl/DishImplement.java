@@ -72,7 +72,9 @@ public class DishImplement implements DishService {
     public DishRequest getDishByID(int id) {
         Dish dish = dishRepository.findById(id).orElseThrow(()->new DishNotFoundException("Dish could not be found"));
         List<DishIngredientDTO> dishIngredientDTOList = dish.getDishIngredients().stream().map(this::maptoDishIngredientDTO).toList();
-        return mapToDishRequest(dish, dishIngredientDTOList);
+        DishCategory dc = dishCategoryRepository.findById(dish.getCategory().getId()).orElseThrow(() -> new CategoryNotFoundException("Category could not be found"));
+        CategoryDTO categoryDTO = mapToCategoryDTO(dc);
+        return mapToDishRequest(dish, dishIngredientDTOList,categoryDTO);
     }
 
     @Override
@@ -128,14 +130,12 @@ public class DishImplement implements DishService {
     }
 
     @Override
-    public Page<Dish> searchDishByFilter(int pageNumber, int pageSize, String sortField, String sortDir, String keyword) {
+    public Page<Dish> searchDishByFilter(int pageNumber, int pageSize, double minPrice, double maxPrice, String sortField, String sortDir, String keyword) {
         Sort sort = Sort.by(sortField);
         sort = sortDir.equals("asc") ? sort.ascending() : sort.descending();
         Pageable pageable = PageRequest.of(pageNumber - 1, pageSize, sort);
-        Page<Dish> dishes= dishRepository.findByNameAndPrice(keyword, pageable);
-
+        Page<Dish> dishes= dishRepository.findByNameAndPrice(keyword, minPrice, maxPrice, pageable);
         return dishes;
-
     }
     @Override
     public Page<DishDTO> getAllDishes(int pageNumber, int pageSize, String sortField, String sortDir) {
@@ -161,17 +161,25 @@ public class DishImplement implements DishService {
                 .dishIngredients(new ArrayList<>())
                 .build();
     }
-    private DishRequest mapToDishRequest(Dish dish, List<DishIngredientDTO> ingredientDTOList) {
+    private CategoryDTO mapToCategoryDTO(DishCategory category) {
+        return CategoryDTO.builder()
+                .id(category.getId())
+                .category(category.getCategory())
+                .build();
+    }
+    private DishRequest mapToDishRequest(Dish dish, List<DishIngredientDTO> ingredientDTOList, CategoryDTO categoryDTO) {
         return DishRequest.builder()
                 .id(dish.getId())
                 .name(dish.getName())
                 .price(dish.getPrice())
                 .dishIngredientList(ingredientDTOList)
+                .category(categoryDTO)
                 .build();
     }
     private DishIngredientDTO maptoDishIngredientDTO(DishIngredient dishIngredient){
         DishIngredientDTO dishIngredientDTO = new DishIngredientDTO();
         dishIngredientDTO.setId(dishIngredient.getIngredient().getId());
+        dishIngredientDTO.setName(dishIngredient.getIngredient().getName());
         return dishIngredientDTO;
     }
 
