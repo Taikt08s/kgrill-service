@@ -76,6 +76,13 @@ public class DeliveryOrderImpl implements DeliveryOrderService {
             user.setCurrentOrder(newOrder);
             user = userRepository.save(user);
         }
+        for (OrderDetail orderDetail : orderDetailRepository.findOrderDetailByOrderId(user.getCurrentOrder().getId())){
+            if (orderDetail.getPackageEntity().getId() == pkg.getId()){
+                orderDetail.setQuantity(quantity);
+                orderDetailRepository.save(orderDetail);
+                return;
+            }
+        }
         OrderDetail newOrderDetail = new OrderDetail();
         newOrderDetail.setQuantity(quantity); // check quantity or not?
         newOrderDetail.setPackageEntity(pkg);
