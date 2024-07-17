@@ -456,7 +456,7 @@ public class DeliveryOrderImpl implements DeliveryOrderService {
                 .shippedAddress(deliveryOrder.getShippedAddress())
                 .shippingFee(deliveryOrder.getShippingFee() != null ? deliveryOrder.getShippingFee().longValue() : 0)
                 .status(deliveryOrder.getStatus())
-                .paymentMethod(deliveryOrder.getPaymentMethod().getMethod())
+                .paymentMethod(deliveryOrder.getPaymentMethod() != null ? deliveryOrder.getPaymentMethod().getMethod() : null)
                 .orderDetails(deliveryOrder.getOrderDetails().stream().map(this::mapToOrderDetailDto).toList())
                 .build();
     }
