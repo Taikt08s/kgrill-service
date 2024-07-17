@@ -22,6 +22,7 @@ public interface DeliveryOrderService {
     OrderDetailAfterLoginRequest getOrderDetailAfterLogin(UUID userId);
 
     ResponseEntity<Object> getNumberOfOrders();
+    ResponseEntity<Object> cancelOrderForManager(Long orderId);
 
     ResponseEntity<Object> getRevenueByPeriod(int pageNo, int pageSize, String sortBy, String sortDir, String period, LocalDate startDate);
 
@@ -30,4 +31,5 @@ public interface DeliveryOrderService {
     ResponseEntity<Object> getDeliveryOrderDetailByShipperId(int pageNo, int pageSize, String sortBy, String sortDir, int shipperId);
 
     ResponseEntity<Object> getDeliveryOrderByStatus(int pageNo, int pageSize, String sortBy, String sortDir, String status);
+
 }
