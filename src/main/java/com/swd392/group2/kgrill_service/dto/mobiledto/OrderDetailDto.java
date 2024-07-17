@@ -17,6 +17,9 @@ public class OrderDetailDto {
     @JsonProperty("order_detail_id")
     private Integer orderDetailId;
 
+    @JsonProperty("package_id")
+    private Integer packageId;
+
     @Schema(description = "Package's name", example = "Combo Bò nướng mĩ vị")
     @JsonProperty("package_name")
     private String packageName;

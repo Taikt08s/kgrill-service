@@ -4,6 +4,7 @@ import com.swd392.group2.kgrill_model.model.*;
 import com.swd392.group2.kgrill_model.model.Package;
 import com.swd392.group2.kgrill_model.repository.*;
 import com.swd392.group2.kgrill_service.dto.*;
+import com.swd392.group2.kgrill_service.dto.mobiledto.DeliveryOrderDto;
 import com.swd392.group2.kgrill_service.dto.mobiledto.OrderDetailAfterLoginRequest;
 import com.swd392.group2.kgrill_service.dto.mobiledto.OrderDetailDto;
 import com.swd392.group2.kgrill_service.dto.response.DeliveryOrderElement;
@@ -64,13 +65,14 @@ public class DeliveryOrderImpl implements DeliveryOrderService {
     }
 
     @Override
+    @Transactional
     public void addPackageToDeliveryOrder(UUID userId, int packageId, int quantity) {
         User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
         Package pkg = packageRepository.findById(packageId).orElseThrow(() -> new RuntimeException("Package not found"));
         if (user.getCurrentOrder() == null) {
             DeliveryOrder newOrder = new DeliveryOrder();
             newOrder.setAccount(user);
-            newOrder.setStatus("ordering");
+            newOrder.setStatus("Ordering");
             user.setCurrentOrder(newOrder);
             user = userRepository.save(user);
         }
@@ -95,6 +97,13 @@ public class DeliveryOrderImpl implements DeliveryOrderService {
 
     @Override
     @Transactional
+    public List<DeliveryOrderDto> getOrderHistory(UUID userId) {
+        User currentUser = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User could not be found"));
+        return currentUser.getOrders().stream().map(this::mapToDeliveryOrderDto).toList();
+    }
+
+    @Override
+    @Transactional
     public OrderDetailAfterLoginRequest getOrderDetailAfterLogin(UUID userId) {
         OrderDetailAfterLoginRequest orderDetailAfterLoginRequest = new OrderDetailAfterLoginRequest();
         User currentUser = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User could not be found"));
@@ -103,6 +112,9 @@ public class DeliveryOrderImpl implements DeliveryOrderService {
             int currentOrderId = currentUser.getCurrentOrder().getId();
 
             List<OrderDetail> orderDetailList = orderDetailRepository.findOrderDetailByOrderId(currentOrderId);
+            if (orderDetailList.isEmpty()){
+                return orderDetailAfterLoginRequest;
+            }
             List<OrderDetailDto> orderDetailDtoList = orderDetailList.stream().map(this::mapToOrderDetailDto).toList();
 
             orderDetailAfterLoginRequest.setOrderId(currentOrderId);
@@ -427,10 +439,25 @@ public class DeliveryOrderImpl implements DeliveryOrderService {
     private OrderDetailDto mapToOrderDetailDto(OrderDetail orderDetail){
         return OrderDetailDto.builder()
                 .orderDetailId(orderDetail.getId())
+                .packageId(orderDetail.getPackageEntity().getId())
                 .packageName(orderDetail.getPackageEntity().getName())
                 .packagePrice(orderDetail.getComboPrice().longValue())
                 .thumbnailUrl(orderDetail.getPackageEntity().getThumbnailUrl())
                 .packageQuantity(orderDetail.getQuantity())
+                .build();
+    }
+
+    private DeliveryOrderDto mapToDeliveryOrderDto(DeliveryOrder deliveryOrder){
+        return DeliveryOrderDto.builder()
+                .orderId(deliveryOrder.getId())
+                .orderDate(deliveryOrder.getOrderDate())
+                .orderValue(deliveryOrder.getOrderValue().longValue())
+                .shippedDate(deliveryOrder.getShippedDate())
+                .shippedAddress(deliveryOrder.getShippedAddress())
+                .shippingFee(deliveryOrder.getShippingFee().longValue())
+                .status(deliveryOrder.getStatus())
+                .paymentMethod(deliveryOrder.getPaymentMethod().getMethod())
+                .orderDetails(deliveryOrder.getOrderDetails().stream().map(this::mapToOrderDetailDto).toList())
                 .build();
     }
 }
