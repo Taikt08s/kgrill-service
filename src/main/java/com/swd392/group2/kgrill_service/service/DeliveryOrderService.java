@@ -2,6 +2,7 @@ package com.swd392.group2.kgrill_service.service;
 
 import com.swd392.group2.kgrill_model.model.Package;
 import com.swd392.group2.kgrill_service.dto.DeliveryLocationDTO;
+import com.swd392.group2.kgrill_service.dto.mobiledto.OrderDetailAfterLoginRequest;
 import org.springframework.http.ResponseEntity;
 
 import java.sql.Date;
@@ -13,6 +14,12 @@ public interface DeliveryOrderService {
     ResponseEntity<Object> updateDeliveryOrderLocation (Long id, DeliveryLocationDTO deliveryLocationDTO);
 
     void addPackageToDeliveryOrder (UUID userId, int packageId, int quantity);
+
+    void updateOrderDetail(int orderDetailId, int quantity);
+
+
+
+    OrderDetailAfterLoginRequest getOrderDetailAfterLogin(UUID userId);
 
     ResponseEntity<Object> getNumberOfOrders();
 
