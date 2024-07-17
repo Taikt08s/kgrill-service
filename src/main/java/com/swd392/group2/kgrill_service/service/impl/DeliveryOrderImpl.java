@@ -149,7 +149,7 @@ public class DeliveryOrderImpl implements DeliveryOrderService {
             content.add(revenueElementResponse);
         }
 
-        Page<RevenueElementResponse> deliveryOrderPage =  convertListToPage(content, pageable);
+        Page<RevenueElementResponse> deliveryOrderPage = convertListToPage(content, pageable);
         List<RevenueElementResponse> contentList = deliveryOrderPage.getContent();
 
         RevenueResponse revenueResponse = new RevenueResponse();
@@ -176,22 +176,40 @@ public class DeliveryOrderImpl implements DeliveryOrderService {
             deliveryOrderPage = deliveryOrderRepository.getDeliveryOrderByMonth(pageable, startDate.getYear(), startDate.getMonthValue());
         }
 
-        RevenueDetailResponse revenueResponse = extractDeliveryOrderDetail(deliveryOrderPage,pageable);
-       return CustomSuccessHandler.responseBuilder(HttpStatus.OK, "Successfully retrieved revenue by daily", revenueResponse);
+        RevenueDetailResponse revenueResponse = extractDeliveryOrderDetail(deliveryOrderPage, pageable);
+        return CustomSuccessHandler.responseBuilder(HttpStatus.OK, "Successfully retrieved revenue by daily", revenueResponse);
     }
 
     @Override
-    public ResponseEntity<Object> getDeliveryOrderDetailByShipperId(int pageNo, int pageSize, String sortBy, String sortDir, int shipperId){
+    public ResponseEntity<Object> getDeliveryOrderDetailByShipperId(int pageNo, int pageSize, String sortBy, String sortDir, int shipperId) {
         Sort sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
         Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
 
         Page<DeliveryOrder> deliveryOrderPage = deliveryOrderRepository.getByShipperId(shipperId, pageable);
 
-        RevenueDetailResponse revenueResponse = extractDeliveryOrderDetail(deliveryOrderPage,pageable);
+        RevenueDetailResponse revenueResponse = extractDeliveryOrderDetail(deliveryOrderPage, pageable);
 
         return CustomSuccessHandler.responseBuilder(HttpStatus.OK, "Successfully retrieved Delivery Order Detail by shipper", revenueResponse);
     }
 
+    @Override
+    public ResponseEntity<Object> cancelOrderForManager(Long orderId) {
+        DeliveryOrder deliveryOrder = deliveryOrderRepository.findById(orderId).orElseThrow(() -> new RuntimeException("User not found"));
+
+        if (deliveryOrder.getStatus() != null) {
+            if (deliveryOrder.getStatus().equalsIgnoreCase("Delivered")) {
+//                ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Order is being delivered and cannot be cancelled");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Order is being delivered and cannot be cancelled");
+            }else if(deliveryOrder.getStatus().equalsIgnoreCase("Cancelled")){
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Order cancelled already");
+            }else {
+                deliveryOrder.setStatus("Cancelled");
+                deliveryOrderRepository.save(deliveryOrder);
+                return CustomSuccessHandler.responseBuilder(HttpStatus.OK, "Cancel order successfully", "");
+            }
+        }
+        return null;
+    }
     public RevenueDetailResponse extractDeliveryOrderDetail(Page<DeliveryOrder> deliveryOrderPage,  Pageable pageable){
 
         List<DeliveryOrder> deliveryOrders = deliveryOrderPage.getContent();
