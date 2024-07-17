@@ -78,14 +78,6 @@ public class UserImplement implements UserService {
         List<User> UserList = UserContent.getContent();
         List<CustomUserProfile> content = UserList.stream().map(UserProfile -> modelMapper.map(UserProfile, CustomUserProfile.class)).collect(Collectors.toList());
 
-        for (CustomUserProfile userProfile : content) {
-            switch (userProfile.getRole()) {
-                case "1" -> userProfile.setRole("USER");
-                case "2" -> userProfile.setRole("MANAGER");
-                case "3" -> userProfile.setRole("SHIPPER");
-            }
-        }
-
         UserProfileResponse userProfileResponse = new UserProfileResponse();
         userProfileResponse.setContent(content);
         userProfileResponse.setPageNo(UserContent.getNumber());

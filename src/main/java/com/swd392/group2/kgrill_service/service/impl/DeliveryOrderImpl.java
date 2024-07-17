@@ -4,7 +4,12 @@ import com.swd392.group2.kgrill_model.model.*;
 import com.swd392.group2.kgrill_model.model.Package;
 import com.swd392.group2.kgrill_model.repository.*;
 import com.swd392.group2.kgrill_service.dto.*;
+import com.swd392.group2.kgrill_service.dto.mobiledto.OrderDetailAfterLoginRequest;
+import com.swd392.group2.kgrill_service.dto.mobiledto.OrderDetailDto;
+import com.swd392.group2.kgrill_service.dto.response.DeliveryOrderElement;
+import com.swd392.group2.kgrill_service.dto.response.DeliveryOrderForManager;
 import com.swd392.group2.kgrill_service.exception.CustomSuccessHandler;
+import com.swd392.group2.kgrill_service.exception.OrderDetailNotFoundException;
 import com.swd392.group2.kgrill_service.exception.ResourceNotFoundException;
 import com.swd392.group2.kgrill_service.service.DeliveryOrderService;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +23,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.swing.text.html.parser.Entity;
 import java.sql.Date;
@@ -74,6 +80,35 @@ public class DeliveryOrderImpl implements DeliveryOrderService {
         newOrderDetail.setComboPrice(pkg.getPrice());
         newOrderDetail.setOrder(user.getCurrentOrder());
         orderDetailRepository.save(newOrderDetail);
+    }
+
+    @Override
+    public void updateOrderDetail(int orderDetailId, int quantity) {
+        OrderDetail existedOrderDetail = orderDetailRepository.findById(orderDetailId).orElseThrow(() -> new OrderDetailNotFoundException("Order detail could not be found"));
+        if (quantity == 0) {
+            orderDetailRepository.delete(existedOrderDetail);
+        } else {
+            existedOrderDetail.setQuantity(quantity);
+            orderDetailRepository.save(existedOrderDetail);
+        }
+    }
+
+    @Override
+    @Transactional
+    public OrderDetailAfterLoginRequest getOrderDetailAfterLogin(UUID userId) {
+        OrderDetailAfterLoginRequest orderDetailAfterLoginRequest = new OrderDetailAfterLoginRequest();
+        User currentUser = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User could not be found"));
+
+        if (currentUser.getCurrentOrder() != null){
+            int currentOrderId = currentUser.getCurrentOrder().getId();
+
+            List<OrderDetail> orderDetailList = orderDetailRepository.findOrderDetailByOrderId(currentOrderId);
+            List<OrderDetailDto> orderDetailDtoList = orderDetailList.stream().map(this::mapToOrderDetailDto).toList();
+
+            orderDetailAfterLoginRequest.setOrderId(currentOrderId);
+            orderDetailAfterLoginRequest.setOrderDetailList(orderDetailDtoList);
+        }
+        return orderDetailAfterLoginRequest;
     }
 
     @Override
@@ -198,7 +233,6 @@ public class DeliveryOrderImpl implements DeliveryOrderService {
 
         if (deliveryOrder.getStatus() != null) {
             if (deliveryOrder.getStatus().equalsIgnoreCase("Delivered")) {
-//                ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Order is being delivered and cannot be cancelled");
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Order is being delivered and cannot be cancelled");
             }else if(deliveryOrder.getStatus().equalsIgnoreCase("Cancelled")){
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Order cancelled already");
@@ -208,9 +242,59 @@ public class DeliveryOrderImpl implements DeliveryOrderService {
                 return CustomSuccessHandler.responseBuilder(HttpStatus.OK, "Cancel order successfully", "");
             }
         }
+
         return null;
     }
-    public RevenueDetailResponse extractDeliveryOrderDetail(Page<DeliveryOrder> deliveryOrderPage,  Pageable pageable){
+
+    @Override
+    public ResponseEntity<Object> getDeliveryOrderByStatus(int pageNo, int pageSize, String sortBy, String sortDir, String status) {
+        Sort sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
+        Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
+
+        Page<DeliveryOrder> deliveryOrderPage = deliveryOrderRepository.getDeliveryOrderByStatus(status, pageable);
+        List<DeliveryOrder> deliveryOrders = deliveryOrderPage.getContent();
+
+        List<DeliveryOrderElement> content = deliveryOrders.stream()
+                .map(deliveryOrder -> modelMapper.map(deliveryOrder, DeliveryOrderElement.class))
+                .collect(Collectors.toList());
+
+        for (DeliveryOrderElement d : content) {
+            List<String> packageName = new ArrayList<>();
+            float deliveryOrderPrice = 0;
+            List<OrderDetail> orderDetails = orderDetailRepository.findOrderDetailByOrderId(d.getId());
+
+            //tính tiền
+            for (OrderDetail o : orderDetails) {
+                if (Objects.equals(o.getOrder().getId(), d.getId())) {
+                    deliveryOrderPrice += o.getComboPrice() * o.getQuantity();
+                    packageName.add(o.getPackageEntity().getName());
+                }
+            }
+            d.setOrderValue(deliveryOrderPrice);
+            d.setPackageName(packageName);
+
+            //Lấy Username
+            User users = userRepository.findById(d.getAccountId())
+                    .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+            d.setUserName(users.getFirstName() + " " + users.getLastName());
+            d.setPhone(users.getPhone());
+            d.setAddress(users.getAddress());
+
+        }
+
+
+        DeliveryOrderForManager deliveryOrderForManager = new DeliveryOrderForManager();
+        deliveryOrderForManager.setContent(content);
+        deliveryOrderForManager.setTotalPages(deliveryOrderPage.getTotalPages());
+        deliveryOrderForManager.setTotalElements(deliveryOrderPage.getTotalElements());
+        deliveryOrderForManager.setPageNo(deliveryOrderPage.getNumber());
+        deliveryOrderForManager.setPageSize(deliveryOrderPage.getSize());
+        deliveryOrderForManager.setLast(deliveryOrderPage.isLast());
+
+        return CustomSuccessHandler.responseBuilder(HttpStatus.OK, "Successfully retrieved User's ordering for Manager ", deliveryOrderForManager);
+    }
+
+    private RevenueDetailResponse extractDeliveryOrderDetail(Page<DeliveryOrder> deliveryOrderPage, Pageable pageable) {
 
         List<DeliveryOrder> deliveryOrders = deliveryOrderPage.getContent();
         List<RevenueDetailElementResponse> content = deliveryOrders.stream()
@@ -222,7 +306,7 @@ public class DeliveryOrderImpl implements DeliveryOrderService {
             //Lấy ra các package name
             List<String> packageName = new ArrayList<>();
             float deliveryOrderPrice = 0;
-            List<OrderDetail> orderDetails = orderDetailRepository.findByDeliveryOrderId(d.getId());
+            List<OrderDetail> orderDetails = orderDetailRepository.findOrderDetailByOrderId(d.getId());
             for (OrderDetail o : orderDetails) {
                 if (Objects.equals(o.getOrder().getId(), d.getId())) {
                     deliveryOrderPrice += o.getComboPrice() * o.getQuantity();
@@ -254,10 +338,10 @@ public class DeliveryOrderImpl implements DeliveryOrderService {
         revenueResponse.setLast(deliveryOrderPage.isLast());
 
 
-        return  revenueResponse;
+        return revenueResponse;
     }
 
-    public Map<Object, List<DeliveryOrder>> groupByPeriod(List<DeliveryOrder> deliveryOrders, String period) {
+    private Map<Object, List<DeliveryOrder>> groupByPeriod(List<DeliveryOrder> deliveryOrders, String period) {
 
         Map<Object, List<DeliveryOrder>> groupedList = deliveryOrders.stream()
                 .collect(Collectors.groupingBy(deliveryOrder ->
@@ -279,7 +363,7 @@ public class DeliveryOrderImpl implements DeliveryOrderService {
         return groupedList;
     }
 
-    public String getDateTimeFormatter(Object mapKey, String period){
+    private String getDateTimeFormatter(Object mapKey, String period) {
         String date;
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
@@ -339,5 +423,15 @@ public class DeliveryOrderImpl implements DeliveryOrderService {
         int end = Math.min((start + pageable.getPageSize()), sortedContent.size());
         List<RevenueElementResponse> subList = sortedContent.subList(start, end);
         return new PageImpl<>(subList, pageable, sortedContent.size());
+    }
+
+    private OrderDetailDto mapToOrderDetailDto(OrderDetail orderDetail){
+        return OrderDetailDto.builder()
+                .orderDetailId(orderDetail.getId())
+                .packageName(orderDetail.getPackageEntity().getName())
+                .packagePrice(orderDetail.getComboPrice().longValue())
+                .thumbnailUrl(orderDetail.getPackageEntity().getThumbnailUrl())
+                .packageQuantity(orderDetail.getQuantity())
+                .build();
     }
 }
