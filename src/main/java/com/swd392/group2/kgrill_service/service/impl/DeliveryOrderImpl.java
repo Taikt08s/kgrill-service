@@ -4,9 +4,12 @@ import com.swd392.group2.kgrill_model.model.*;
 import com.swd392.group2.kgrill_model.model.Package;
 import com.swd392.group2.kgrill_model.repository.*;
 import com.swd392.group2.kgrill_service.dto.*;
+import com.swd392.group2.kgrill_service.dto.mobiledto.OrderDetailAfterLoginRequest;
+import com.swd392.group2.kgrill_service.dto.mobiledto.OrderDetailDto;
 import com.swd392.group2.kgrill_service.dto.response.DeliveryOrderElement;
 import com.swd392.group2.kgrill_service.dto.response.DeliveryOrderForManager;
 import com.swd392.group2.kgrill_service.exception.CustomSuccessHandler;
+import com.swd392.group2.kgrill_service.exception.OrderDetailNotFoundException;
 import com.swd392.group2.kgrill_service.exception.ResourceNotFoundException;
 import com.swd392.group2.kgrill_service.service.DeliveryOrderService;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +23,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.swing.text.html.parser.Entity;
 import java.sql.Date;
@@ -76,6 +80,35 @@ public class DeliveryOrderImpl implements DeliveryOrderService {
         newOrderDetail.setComboPrice(pkg.getPrice());
         newOrderDetail.setOrder(user.getCurrentOrder());
         orderDetailRepository.save(newOrderDetail);
+    }
+
+    @Override
+    public void updateOrderDetail(int orderDetailId, int quantity) {
+        OrderDetail existedOrderDetail = orderDetailRepository.findById(orderDetailId).orElseThrow(() -> new OrderDetailNotFoundException("Order detail could not be found"));
+        if (quantity == 0) {
+            orderDetailRepository.delete(existedOrderDetail);
+        } else {
+            existedOrderDetail.setQuantity(quantity);
+            orderDetailRepository.save(existedOrderDetail);
+        }
+    }
+
+    @Override
+    @Transactional
+    public OrderDetailAfterLoginRequest getOrderDetailAfterLogin(UUID userId) {
+        OrderDetailAfterLoginRequest orderDetailAfterLoginRequest = new OrderDetailAfterLoginRequest();
+        User currentUser = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User could not be found"));
+
+        if (currentUser.getCurrentOrder() != null){
+            int currentOrderId = currentUser.getCurrentOrder().getId();
+
+            List<OrderDetail> orderDetailList = orderDetailRepository.findOrderDetailByOrderId(currentOrderId);
+            List<OrderDetailDto> orderDetailDtoList = orderDetailList.stream().map(this::mapToOrderDetailDto).toList();
+
+            orderDetailAfterLoginRequest.setOrderId(currentOrderId);
+            orderDetailAfterLoginRequest.setOrderDetailList(orderDetailDtoList);
+        }
+        return orderDetailAfterLoginRequest;
     }
 
     @Override
@@ -151,7 +184,7 @@ public class DeliveryOrderImpl implements DeliveryOrderService {
             content.add(revenueElementResponse);
         }
 
-        Page<RevenueElementResponse> deliveryOrderPage =  convertListToPage(content, pageable);
+        Page<RevenueElementResponse> deliveryOrderPage = convertListToPage(content, pageable);
         List<RevenueElementResponse> contentList = deliveryOrderPage.getContent();
 
         RevenueResponse revenueResponse = new RevenueResponse();
@@ -178,18 +211,18 @@ public class DeliveryOrderImpl implements DeliveryOrderService {
             deliveryOrderPage = deliveryOrderRepository.getDeliveryOrderByMonth(pageable, startDate.getYear(), startDate.getMonthValue());
         }
 
-        RevenueDetailResponse revenueResponse = extractDeliveryOrderDetail(deliveryOrderPage,pageable);
-       return CustomSuccessHandler.responseBuilder(HttpStatus.OK, "Successfully retrieved revenue by daily", revenueResponse);
+        RevenueDetailResponse revenueResponse = extractDeliveryOrderDetail(deliveryOrderPage, pageable);
+        return CustomSuccessHandler.responseBuilder(HttpStatus.OK, "Successfully retrieved revenue by daily", revenueResponse);
     }
 
     @Override
-    public ResponseEntity<Object> getDeliveryOrderDetailByShipperId(int pageNo, int pageSize, String sortBy, String sortDir, int shipperId){
+    public ResponseEntity<Object> getDeliveryOrderDetailByShipperId(int pageNo, int pageSize, String sortBy, String sortDir, int shipperId) {
         Sort sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
         Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
 
         Page<DeliveryOrder> deliveryOrderPage = deliveryOrderRepository.getByShipperId(shipperId, pageable);
 
-        RevenueDetailResponse revenueResponse = extractDeliveryOrderDetail(deliveryOrderPage,pageable);
+        RevenueDetailResponse revenueResponse = extractDeliveryOrderDetail(deliveryOrderPage, pageable);
 
         return CustomSuccessHandler.responseBuilder(HttpStatus.OK, "Successfully retrieved Delivery Order Detail by shipper", revenueResponse);
     }
@@ -242,7 +275,7 @@ public class DeliveryOrderImpl implements DeliveryOrderService {
         return CustomSuccessHandler.responseBuilder(HttpStatus.OK, "Successfully retrieved User's ordering for Manager ", deliveryOrderForManager);
     }
 
-    private RevenueDetailResponse extractDeliveryOrderDetail(Page<DeliveryOrder> deliveryOrderPage,  Pageable pageable){
+    private RevenueDetailResponse extractDeliveryOrderDetail(Page<DeliveryOrder> deliveryOrderPage, Pageable pageable) {
 
         List<DeliveryOrder> deliveryOrders = deliveryOrderPage.getContent();
         List<RevenueDetailElementResponse> content = deliveryOrders.stream()
@@ -286,7 +319,7 @@ public class DeliveryOrderImpl implements DeliveryOrderService {
         revenueResponse.setLast(deliveryOrderPage.isLast());
 
 
-        return  revenueResponse;
+        return revenueResponse;
     }
 
     private Map<Object, List<DeliveryOrder>> groupByPeriod(List<DeliveryOrder> deliveryOrders, String period) {
@@ -311,7 +344,7 @@ public class DeliveryOrderImpl implements DeliveryOrderService {
         return groupedList;
     }
 
-    private String getDateTimeFormatter(Object mapKey, String period){
+    private String getDateTimeFormatter(Object mapKey, String period) {
         String date;
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
@@ -371,5 +404,15 @@ public class DeliveryOrderImpl implements DeliveryOrderService {
         int end = Math.min((start + pageable.getPageSize()), sortedContent.size());
         List<RevenueElementResponse> subList = sortedContent.subList(start, end);
         return new PageImpl<>(subList, pageable, sortedContent.size());
+    }
+
+    private OrderDetailDto mapToOrderDetailDto(OrderDetail orderDetail){
+        return OrderDetailDto.builder()
+                .orderDetailId(orderDetail.getId())
+                .packageName(orderDetail.getPackageEntity().getName())
+                .packagePrice(orderDetail.getComboPrice().longValue())
+                .thumbnailUrl(orderDetail.getPackageEntity().getThumbnailUrl())
+                .packageQuantity(orderDetail.getQuantity())
+                .build();
     }
 }
