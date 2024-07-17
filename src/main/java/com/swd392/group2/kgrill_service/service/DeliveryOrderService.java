@@ -2,11 +2,13 @@ package com.swd392.group2.kgrill_service.service;
 
 import com.swd392.group2.kgrill_model.model.Package;
 import com.swd392.group2.kgrill_service.dto.DeliveryLocationDTO;
+import com.swd392.group2.kgrill_service.dto.mobiledto.DeliveryOrderDto;
 import com.swd392.group2.kgrill_service.dto.mobiledto.OrderDetailAfterLoginRequest;
 import org.springframework.http.ResponseEntity;
 
 import java.sql.Date;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.UUID;
 
 public interface DeliveryOrderService {
@@ -17,7 +19,7 @@ public interface DeliveryOrderService {
 
     void updateOrderDetail(int orderDetailId, int quantity);
 
-
+    List<DeliveryOrderDto> getOrderHistory(UUID userId);
 
     OrderDetailAfterLoginRequest getOrderDetailAfterLogin(UUID userId);
 
