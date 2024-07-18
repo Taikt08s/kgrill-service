@@ -24,14 +24,6 @@ public class OrderDetailDtoForOrderHistory  {
     @JsonProperty("package_name")
     private String packageName;
 
-    @Schema(description = "Package's type", example = "nướng")
-    @JsonProperty("package_type")
-    private String packageType;
-
-    @Schema(description = "Package's size", example = "1-2 người")
-    @JsonProperty("package_size")
-    private String packageSize;
-
     @Schema(description = "Package's quantity", example = "1")
     @JsonProperty("package_quantity")
     private int packageQuantity;
