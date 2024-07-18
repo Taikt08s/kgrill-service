@@ -16,7 +16,7 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Schema(description = "Response object for order to show in order history")
+@Schema(description = "Response object for Order to show in Order History")
 public class DeliveryOrderDto {
 
     @JsonProperty("delivery_order_id")
@@ -44,5 +44,5 @@ public class DeliveryOrderDto {
     private String paymentMethod;
 
     @JsonProperty("order_detail")
-    private List<OrderDetailDto> orderDetails;
+    private List<OrderDetailDtoForOrderHistory> orderDetails;
 }
