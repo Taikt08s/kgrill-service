@@ -150,7 +150,7 @@ public class GlobalExceptionHandler {
                 );
     }
     @ExceptionHandler(CategoryNotFoundException.class)
-    public ResponseEntity<ExceptionResponse> handleCategoryNotFoundException(IngredientNotFoundException ex, WebRequest request) {
+    public ResponseEntity<ExceptionResponse> handleCategoryNotFoundException(CategoryNotFoundException ex, WebRequest request) {
         return ResponseEntity
                 .status(HttpStatus.NOT_FOUND)
                 .body(
