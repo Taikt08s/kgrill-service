@@ -7,6 +7,7 @@ import com.swd392.group2.kgrill_service.dto.*;
 import com.swd392.group2.kgrill_service.dto.mobiledto.DeliveryOrderDto;
 import com.swd392.group2.kgrill_service.dto.mobiledto.OrderDetailAfterLoginRequest;
 import com.swd392.group2.kgrill_service.dto.mobiledto.OrderDetailDto;
+import com.swd392.group2.kgrill_service.dto.mobiledto.OrderDetailDtoForOrderHistory;
 import com.swd392.group2.kgrill_service.dto.response.DeliveryOrderElement;
 import com.swd392.group2.kgrill_service.dto.response.DeliveryOrderForManager;
 import com.swd392.group2.kgrill_service.exception.CustomSuccessHandler;
@@ -454,6 +455,19 @@ public class DeliveryOrderImpl implements DeliveryOrderService {
                 .build();
     }
 
+    private OrderDetailDtoForOrderHistory mapToOrderDetailDtoForOrderHistory(OrderDetail orderDetail){
+        return OrderDetailDtoForOrderHistory.builder()
+                .orderDetailId(orderDetail.getId())
+                .packageId(orderDetail.getPackageEntity().getId())
+                .packageName(orderDetail.getPackageEntity().getName())
+                .packageType(orderDetail.getPackageEntity().getPackageType())
+                .packageSize(orderDetail.getPackageEntity().getPackageSize())
+                .packagePrice(orderDetail.getComboPrice() != null ? orderDetail.getComboPrice().longValue() : 0)
+                .thumbnailUrl(orderDetail.getPackageEntity().getThumbnailUrl())
+                .packageQuantity(orderDetail.getQuantity())
+                .build();
+    }
+
     private DeliveryOrderDto mapToDeliveryOrderDto(DeliveryOrder deliveryOrder){
         return DeliveryOrderDto.builder()
                 .orderId(deliveryOrder.getId())
@@ -464,7 +478,7 @@ public class DeliveryOrderImpl implements DeliveryOrderService {
                 .shippingFee(deliveryOrder.getShippingFee() != null ? deliveryOrder.getShippingFee().longValue() : 0)
                 .status(deliveryOrder.getStatus())
                 .paymentMethod(deliveryOrder.getPaymentMethod() != null ? deliveryOrder.getPaymentMethod().getMethod() : null)
-                .orderDetails(deliveryOrder.getOrderDetails().stream().map(this::mapToOrderDetailDto).toList())
+                .orderDetails(deliveryOrder.getOrderDetails().stream().map(this::mapToOrderDetailDtoForOrderHistory).toList())
                 .build();
     }
 }
