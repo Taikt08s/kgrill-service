@@ -94,7 +94,7 @@ public class ShipperImplement implements ShipperService {
     public boolean assignShipperToOrder(long shipperId, long orderId) {
         Shipper shipper = shipperRepository.findById(shipperId).orElseThrow(() -> new RuntimeException("Shipper could not be found"));
         DeliveryOrder deliveryOrder = deliveryOrderRepository.findById(orderId).orElseThrow(() -> new RuntimeException("Order could not be found"));
-        if (shipper.getStatus().equalsIgnoreCase("Available")){
+        if (shipper.getStatus().equalsIgnoreCase("Available") && deliveryOrder.getStatus().equalsIgnoreCase("Preparing")){
             deliveryOrder.setShipper(shipper);
             deliveryOrderRepository.save(deliveryOrder);
             return true;
