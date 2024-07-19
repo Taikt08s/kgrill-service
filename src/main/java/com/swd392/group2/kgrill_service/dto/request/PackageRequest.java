@@ -53,7 +53,7 @@ public class PackageRequest {
     @JsonProperty("package_dish_list")
     private List<PackageDishDto> packageDishList;
 
-    @Schema(description = "Package's thumbnail file")
+    @Schema(type = "string", format = "binary", description = "Package thumbnail file")
     @JsonProperty("package_thumbnail_file")
     private MultipartFile thumbnailUrl;
 }
