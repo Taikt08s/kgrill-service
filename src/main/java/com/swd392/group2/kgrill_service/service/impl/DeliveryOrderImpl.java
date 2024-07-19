@@ -222,9 +222,6 @@ public class DeliveryOrderImpl implements DeliveryOrderService {
 //             Lấy ngày đặt hàng
             revenueElementResponse.setOrderDate(getDateTimeFormatter(map.getKey(), period));
 
-            // Đếm tổng số đơn hàng trong danh sách
-            revenueElementResponse.setTotalOrderNumber(map.getValue().size());
-
             // Đếm số đơn hàng đã hoàn thành (status = "Delivered")
             revenueElementResponse.setCompletedNumber((int) map.getValue().stream()
                     .filter(deliveryOrder -> deliveryOrder.getStatus().equalsIgnoreCase("Delivered"))
@@ -234,6 +231,10 @@ public class DeliveryOrderImpl implements DeliveryOrderService {
             revenueElementResponse.setCancelledNumber((int) map.getValue().stream()
                     .filter(deliveryOrder -> deliveryOrder.getStatus().equalsIgnoreCase("Cancelled"))
                     .count());
+
+
+            // Đếm tổng số đơn hàng trong danh sách
+            revenueElementResponse.setTotalOrderNumber(revenueElementResponse.getCompletedNumber() + revenueElementResponse.getCancelledNumber());
 
             // Tính tổng doanh thu của tất cả các đơn hàng trong danh sách
             revenueElementResponse.setTotalRevenue(map.getValue().stream()
@@ -379,11 +380,15 @@ public class DeliveryOrderImpl implements DeliveryOrderService {
             d.setUserName(users.getFirstName() + " " + users.getLastName());
 
             //Lấy ShipperName
-            Shipper shipper = shipperRepository.findById((long) d.getShipperId())
-                    .orElseThrow(() -> new ResourceNotFoundException("Shipper", "id", String.valueOf(d.getShipperId())));
-            User user = userRepository.findById(UUID.fromString(shipper.getUuid()))
-                    .orElseThrow(() -> new ResourceNotFoundException("Shipper", "id", shipper.getUuid()));
-            d.setShipperName(user.getFirstName() + " " + user.getLastName());
+            Optional<Shipper> shipper = shipperRepository.findById((long) d.getShipperId());
+
+            if (shipper.isEmpty()) {
+                d.setShipperName("Not assigned");
+            } else {
+                User user = userRepository.findById(UUID.fromString(shipper.get().getUuid()))
+                        .orElseThrow(() -> new ResourceNotFoundException("Shipper", "id", shipper.get().getUuid()));
+                d.setShipperName(user.getFirstName() + " " + user.getLastName());
+            }
 
         }
         RevenueDetailResponse revenueResponse = new RevenueDetailResponse();
