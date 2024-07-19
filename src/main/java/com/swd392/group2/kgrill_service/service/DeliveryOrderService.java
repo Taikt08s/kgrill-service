@@ -29,6 +29,8 @@ public interface DeliveryOrderService {
     ResponseEntity<Object> getNumberOfOrders();
     ResponseEntity<Object> cancelOrderForManager(Long orderId);
 
+    boolean acceptOrderForManager(long orderId);
+
     ResponseEntity<Object> getRevenueByPeriod(int pageNo, int pageSize, String sortBy, String sortDir, String period, LocalDate startDate);
 
     ResponseEntity<Object> getDeliveryOrderDetailByAdmin(int pageNo, int pageSize, String sortBy, String sortDir, String period, LocalDate startDate);
