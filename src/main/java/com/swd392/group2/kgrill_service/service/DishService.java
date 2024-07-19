@@ -16,7 +16,7 @@ public interface DishService {
     DishRequest getDishByID(int id);
     void updateDish(DishRequest dishRequest);
     void deleteDish(int id);
-    Page<Dish> searchDishByFilter(int pageNumber, int pageSize, double minPrice, double maxPrice, String sortField, String sortDir,String keyword);
+    Page<Dish> searchDishByFilter(int pageNumber, int pageSize, double minPrice, double maxPrice, String sortField, String sortDir,String keyword, String category);//
 
     Page<DishDTO> getAllDishes(int pageNumber, int pageSize, String sortField, String sortDir);
 
