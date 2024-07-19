@@ -14,4 +14,5 @@ public interface ShipperService {
 
     Page<ShipperDto> getAvailableShipperList(int pageNumber, int pageSize, String sortField, String sortDir);
 
+    boolean assignShipperToOrder(long shipperId, long orderId);
 }
