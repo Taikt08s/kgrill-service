@@ -8,25 +8,26 @@ import com.swd392.group2.kgrill_model.repository.PackageDishRepository;
 import com.swd392.group2.kgrill_model.repository.PackageRepository;
 import com.swd392.group2.kgrill_service.dto.PackageDishDto;
 import com.swd392.group2.kgrill_service.dto.request.PackageRequest;
+import com.swd392.group2.kgrill_service.dto.response.PackageResponse;
 import com.swd392.group2.kgrill_service.dto.response.PackageDetailResponseForMobile;
 import com.swd392.group2.kgrill_service.dto.response.PackageResponseForAdminAndManager;
 import com.swd392.group2.kgrill_service.dto.mobiledto.PackageDishDtoOnMobile;
 import com.swd392.group2.kgrill_service.dto.response.PackageResponseForMobileAsList;
 import com.swd392.group2.kgrill_service.exception.DishNotFoundException;
 import com.swd392.group2.kgrill_service.exception.PackageNotFoundException;
+import com.swd392.group2.kgrill_service.service.CloudinaryUploadService;
 import com.swd392.group2.kgrill_service.service.PackageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.security.access.method.P;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -35,6 +36,7 @@ public class PackageImplement implements PackageService {
     private final PackageRepository packageRepository;
     private final PackageDishRepository packageDishRepository;
     private final DishRepository dishRepository;
+    private final CloudinaryUploadService cloudinaryUploadConfig;
 
     public static String generatePackageCode(int packageNumber) {
         String prefix = "FP-";
@@ -43,10 +45,31 @@ public class PackageImplement implements PackageService {
     }
 
     @Override
-    public void addPackage(PackageRequest pkgRequest, String imgUrl) {
+    public void addPackage(PackageRequest pkgRequest) throws IOException {
         List<PackageDishDto> pkgDishDtoList = pkgRequest.getPackageDishList();
-        pkgRequest.setThumbnailUrl(imgUrl);
-        Package pkg = mapToPackage(pkgRequest);
+
+        if (pkgRequest.getThumbnailUrl() != null && !pkgRequest.getThumbnailUrl().isEmpty()) {
+            String imageUrl = cloudinaryUploadConfig.uploadFile(pkgRequest.getThumbnailUrl());
+            if (imageUrl != null) {
+                Package pkg = mapToPackage(pkgRequest, imageUrl);
+                List<PackageDish> pkgDishList = new ArrayList<>();
+                for (PackageDishDto pkgDishDto : pkgDishDtoList) {
+                    Dish dish = dishRepository.findById(pkgDishDto.getId()).orElseThrow(() -> new DishNotFoundException("Dish could not be found"));
+                    PackageDish pkgDish = new PackageDish();
+                    pkgDish.setDishPrice(dish.getPrice());
+                    pkgDish.setPackageEntity(pkg);
+                    pkgDish.setQuantity(pkgDishDto.getQuantity());
+                    pkgDish.setDish(dish);
+                    pkgDishList.add(pkgDish);
+                }
+                pkg.setPackageDishes(pkgDishList);
+                Package savedPackage = packageRepository.save(pkg);
+                savedPackage.setCode(generatePackageCode(savedPackage.getId()));
+                packageRepository.save(savedPackage);
+            }
+        }
+
+        Package pkg = mapToPackage(pkgRequest, null);
         List<PackageDish> pkgDishList = new ArrayList<>();
         for (PackageDishDto pkgDishDto : pkgDishDtoList) {
             Dish dish = dishRepository.findById(pkgDishDto.getId()).orElseThrow(() -> new DishNotFoundException("Dish could not be found"));
@@ -65,7 +88,7 @@ public class PackageImplement implements PackageService {
 
     @Override
     @Transactional
-    public void updatePackage(PackageRequest pkgRequest) {
+    public void updatePackage(PackageResponse pkgRequest) {
         List<PackageDishDto> pkgDishDtoList = pkgRequest.getPackageDishList();
         Package updatedPackage = mapToPackage(pkgRequest);
         Package existedPackage = packageRepository.findById(pkgRequest.getId()).orElseThrow(() -> new PackageNotFoundException("Package could not be found"));
@@ -118,7 +141,7 @@ public class PackageImplement implements PackageService {
 
     @Override
     @Transactional
-    public PackageRequest getAPackageDetail(int pkgId) {
+    public PackageResponse getAPackageDetail(int pkgId) {
         Package pkg = packageRepository.findById(pkgId).orElseThrow(() -> new PackageNotFoundException("Package could not be found"));
         List<PackageDishDto> dishDtoList = pkg.getPackageDishes().stream().map(this::mapToPackageDishDto).toList();
         return mapToPackageRequest(pkg, dishDtoList);
@@ -207,7 +230,22 @@ public class PackageImplement implements PackageService {
                 .build();
     }
 
-    private Package mapToPackage(PackageRequest pkgRequest) {
+    private Package mapToPackage(PackageResponse pkgResponse) {
+        return Package.builder()
+                .id(pkgResponse.getId())
+                .name(pkgResponse.getName())
+                .description(pkgResponse.getDescription())
+                .code(pkgResponse.getCode())
+                .price(pkgResponse.getPrice())
+                .packageDishes(new ArrayList<>())
+                .packageType(pkgResponse.getPackageType())
+                .packageSize(pkgResponse.getPackageSize())
+                .active(pkgResponse.isActive())
+                .thumbnailUrl(pkgResponse.getThumbnailUrl())
+                .build();
+    }
+
+    private Package mapToPackage(PackageRequest pkgRequest, String thumbnailUrl) {
         return Package.builder()
                 .id(pkgRequest.getId())
                 .name(pkgRequest.getName())
@@ -218,12 +256,12 @@ public class PackageImplement implements PackageService {
                 .packageType(pkgRequest.getPackageType())
                 .packageSize(pkgRequest.getPackageSize())
                 .active(pkgRequest.isActive())
-                .thumbnailUrl(pkgRequest.getThumbnailUrl())
+                .thumbnailUrl(thumbnailUrl)
                 .build();
     }
 
-    private PackageRequest mapToPackageRequest(Package pkg, List<PackageDishDto> dishDtoList) {
-        return PackageRequest.builder()
+    private PackageResponse mapToPackageRequest(Package pkg, List<PackageDishDto> dishDtoList) {
+        return PackageResponse.builder()
                 .id(pkg.getId())
                 .name(pkg.getName())
                 .description(pkg.getDescription())
