@@ -7,7 +7,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -15,7 +14,7 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Schema(description = "Request object for Package")
+@Schema(description = "Response object for Package")
 public class PackageRequest {
 
     @JsonProperty("package_id")
@@ -53,7 +52,7 @@ public class PackageRequest {
     @JsonProperty("package_dish_list")
     private List<PackageDishDto> packageDishList;
 
-    @Schema(type = "string", format = "binary", description = "Package thumbnail file")
-    @JsonProperty("package_thumbnail_file")
-    private MultipartFile thumbnailUrl;
+    @Schema(description = "Package's thumbnail url")
+    @JsonProperty("package_thumbnail_url")
+    private String thumbnailUrl;
 }
