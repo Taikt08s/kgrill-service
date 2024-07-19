@@ -117,6 +117,15 @@ public class PackageImplement implements PackageService {
     }
 
     @Override
+    public void uploadPackageThumbnail(int packageId, String thumbnailUrl) {
+        Package pkg = packageRepository.findById(packageId).orElseThrow(() -> new PackageNotFoundException("Package could not be found"));
+        if (thumbnailUrl != null && !thumbnailUrl.isEmpty()){
+            pkg.setThumbnailUrl(thumbnailUrl);
+            packageRepository.save(pkg);
+        }
+    }
+
+    @Override
     @Transactional
     public PackageRequest getAPackageDetail(int pkgId) {
         Package pkg = packageRepository.findById(pkgId).orElseThrow(() -> new PackageNotFoundException("Package could not be found"));
