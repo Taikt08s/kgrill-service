@@ -2,7 +2,6 @@ package com.swd392.group2.kgrill_service.service.impl;
 
 
 import com.swd392.group2.kgrill_model.model.*;
-import com.swd392.group2.kgrill_model.model.Package;
 import com.swd392.group2.kgrill_model.repository.DishCategoryRepository;
 import com.swd392.group2.kgrill_model.repository.DishIngredientRepository;
 import com.swd392.group2.kgrill_model.repository.DishRepository;
@@ -10,9 +9,7 @@ import com.swd392.group2.kgrill_model.repository.IngredientRepository;
 import com.swd392.group2.kgrill_service.dto.CategoryDTO;
 import com.swd392.group2.kgrill_service.dto.DishDTO;
 import com.swd392.group2.kgrill_service.dto.DishIngredientDTO;
-import com.swd392.group2.kgrill_service.dto.PackageDishDto;
 import com.swd392.group2.kgrill_service.dto.request.DishRequest;
-import com.swd392.group2.kgrill_service.dto.request.PackageRequest;
 import com.swd392.group2.kgrill_service.exception.CategoryNotFoundException;
 import com.swd392.group2.kgrill_service.exception.DishNotFoundException;
 import com.swd392.group2.kgrill_service.exception.IngredientNotFoundException;
@@ -24,11 +21,10 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
+
 @Service
 public class DishImplement implements DishService {
     private DishRepository dishRepository;
