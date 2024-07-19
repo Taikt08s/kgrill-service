@@ -178,7 +178,7 @@ public class DeliveryOrderImpl implements DeliveryOrderService {
 
     @Override
     public ResponseEntity<Object> cancelOrderForManager(Long orderId) {
-        DeliveryOrder deliveryOrder = deliveryOrderRepository.findById(orderId).orElseThrow(() -> new RuntimeException("User not found"));
+        DeliveryOrder deliveryOrder = deliveryOrderRepository.findById(orderId).orElseThrow(() -> new RuntimeException("Order could not be found"));
 
         if (deliveryOrder.getStatus() != null) {
             if (deliveryOrder.getStatus().equalsIgnoreCase("Delivered")) {
@@ -192,6 +192,17 @@ public class DeliveryOrderImpl implements DeliveryOrderService {
             }
         }
         return null;
+    }
+
+    @Override
+    public boolean acceptOrderForManager(long orderId) {
+        DeliveryOrder order = deliveryOrderRepository.findById(orderId).orElseThrow(() -> new RuntimeException("Order could not be found"));
+        if (order.getStatus() != null && order.getStatus().equalsIgnoreCase("Processing")){
+            order.setStatus("Preparing");
+            deliveryOrderRepository.save(order);
+            return true;
+        }
+        return false;
     }
 
 
