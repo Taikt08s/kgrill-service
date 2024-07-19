@@ -36,11 +36,16 @@ public class DeliveryOrderDtoForCheckOut {
     @Schema(description = "Order's address longitude")
     private Double longitude;
 
+    @Schema(description = "User's phone number", example = "0965423786")
+    @JsonProperty("user_phone")
+    private String userPhone;
+
+
     @Schema(description = "Shipping fee", example = "20000")
     @JsonProperty("shipping_fee")
     private Long shippingFee;
 
-    @Schema(description = "Payment method", example = "Cash")
+    @Schema(description = "Payment method", example = "Cash On Delivery")
     @JsonProperty("order_payment_method")
     private String paymentMethod;
 }
