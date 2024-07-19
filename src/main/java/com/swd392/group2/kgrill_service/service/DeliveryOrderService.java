@@ -3,6 +3,7 @@ package com.swd392.group2.kgrill_service.service;
 import com.swd392.group2.kgrill_model.model.Package;
 import com.swd392.group2.kgrill_service.dto.DeliveryLocationDTO;
 import com.swd392.group2.kgrill_service.dto.mobiledto.DeliveryOrderDto;
+import com.swd392.group2.kgrill_service.dto.mobiledto.DeliveryOrderDtoForCheckOut;
 import com.swd392.group2.kgrill_service.dto.mobiledto.OrderDetailAfterLoginRequest;
 import org.springframework.http.ResponseEntity;
 
@@ -22,6 +23,8 @@ public interface DeliveryOrderService {
     List<DeliveryOrderDto> getOrderHistory(UUID userId);
 
     OrderDetailAfterLoginRequest getOrderDetailAfterLogin(UUID userId);
+
+    boolean checkOutOrder(DeliveryOrderDtoForCheckOut deliveryOrderDtoForCheckOut);
 
     ResponseEntity<Object> getNumberOfOrders();
     ResponseEntity<Object> cancelOrderForManager(Long orderId);
