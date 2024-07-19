@@ -65,6 +65,11 @@ public class PackageImplement implements PackageService {
     }
 
     @Override
+    public PackageRequest preAddPackage() {
+        return null;
+    }
+
+    @Override
     @Transactional
     public void updatePackage(PackageRequest pkgRequest) {
         List<PackageDishDto> pkgDishDtoList = pkgRequest.getPackageDishList();
