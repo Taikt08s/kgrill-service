@@ -1,4 +1,4 @@
-package com.swd392.group2.kgrill_service.dto.request;
+package com.swd392.group2.kgrill_service.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.swd392.group2.kgrill_service.dto.PackageDishDto;
@@ -7,7 +7,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -15,8 +14,8 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Schema(description = "Request object for Package")
-public class PackageRequest {
+@Schema(description = "Response object for Package")
+public class PackageResponse {
 
     @JsonProperty("package_id")
     private Integer id;
@@ -53,7 +52,7 @@ public class PackageRequest {
     @JsonProperty("package_dish_list")
     private List<PackageDishDto> packageDishList;
 
-    @Schema(description = "Package's thumbnail file")
-    @JsonProperty("package_thumbnail_file")
-    private MultipartFile thumbnailUrl;
+    @Schema(description = "Package's thumbnail url")
+    @JsonProperty("package_thumbnail_url")
+    private String thumbnailUrl;
 }
