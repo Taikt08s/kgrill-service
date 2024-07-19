@@ -40,7 +40,7 @@ public class DeliveryOrderDtoForCheckOut {
     @JsonProperty("shipping_fee")
     private Long shippingFee;
 
-    @Schema(description = "Payment method", example = "Cod")
+    @Schema(description = "Payment method", example = "Cash")
     @JsonProperty("order_payment_method")
     private String paymentMethod;
 }
