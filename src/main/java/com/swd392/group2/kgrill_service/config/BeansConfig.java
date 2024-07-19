@@ -50,7 +50,7 @@ public class BeansConfig {
         config.setAllowedOrigins(Arrays.asList(
                 "http://localhost:3000",
                 "http://localhost:4000",
-                "https://kgrill-frontend-lmjn.onrender.com/"
+                "https://kgrill-frontend-lmjn.onrender.com"
         ));
         config.setAllowedHeaders(Arrays.asList(
                 HttpHeaders.ORIGIN,
