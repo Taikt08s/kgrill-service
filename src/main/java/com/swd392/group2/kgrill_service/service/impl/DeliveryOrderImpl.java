@@ -516,6 +516,7 @@ public class DeliveryOrderImpl implements DeliveryOrderService {
                 .customerPhone(deliveryOrder.getAccount().getPhone())
                 .shippingFee(deliveryOrder.getShippingFee() != null ? deliveryOrder.getShippingFee().longValue() : 0)
                 .status(deliveryOrder.getStatus())
+                .orderCode(deliveryOrder.getCode())
                 .paymentMethod(deliveryOrder.getPaymentMethod() != null ? deliveryOrder.getPaymentMethod().getMethod() : null)
                 .orderDetails(deliveryOrder.getOrderDetails().stream().map(this::mapToOrderDetailDtoForOrderHistory).toList())
                 .build();
