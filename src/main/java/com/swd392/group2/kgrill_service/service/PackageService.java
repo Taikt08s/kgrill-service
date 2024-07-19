@@ -10,7 +10,7 @@ import java.util.List;
 
 public interface PackageService{
 
-    void addPackage(PackageRequest pkgRequest);
+    void addPackage(PackageRequest pkgRequest, String imgUrl);
 
     void updatePackage(PackageRequest pkgRequest);
 
