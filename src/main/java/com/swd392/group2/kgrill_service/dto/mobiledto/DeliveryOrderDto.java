@@ -34,6 +34,10 @@ public class DeliveryOrderDto {
     @JsonProperty("shipped_address")
     private String shippedAddress;
 
+    @Schema(description = "Order code", example = "OD-00001")
+    @JsonProperty("order_code")
+    private String orderCode;
+
     @Schema(description = "User's phone number", example = "0965423786")
     @JsonProperty("user_phone")
     private String customerPhone;
