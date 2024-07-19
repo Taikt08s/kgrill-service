@@ -8,7 +8,6 @@ import com.swd392.group2.kgrill_model.repository.PackageDishRepository;
 import com.swd392.group2.kgrill_model.repository.PackageRepository;
 import com.swd392.group2.kgrill_service.dto.PackageDishDto;
 import com.swd392.group2.kgrill_service.dto.request.PackageRequest;
-import com.swd392.group2.kgrill_service.dto.response.PackageResponse;
 import com.swd392.group2.kgrill_service.dto.response.PackageDetailResponseForMobile;
 import com.swd392.group2.kgrill_service.dto.response.PackageResponseForAdminAndManager;
 import com.swd392.group2.kgrill_service.dto.mobiledto.PackageDishDtoOnMobile;
@@ -45,31 +44,9 @@ public class PackageImplement implements PackageService {
     }
 
     @Override
-    public void addPackage(PackageRequest pkgRequest) throws IOException {
+    public void addPackage(PackageRequest pkgRequest){
         List<PackageDishDto> pkgDishDtoList = pkgRequest.getPackageDishList();
-
-        if (pkgRequest.getThumbnailUrl() != null && !pkgRequest.getThumbnailUrl().isEmpty()) {
-            String imageUrl = cloudinaryUploadConfig.uploadFile(pkgRequest.getThumbnailUrl());
-            if (imageUrl != null) {
-                Package pkg = mapToPackage(pkgRequest, imageUrl);
-                List<PackageDish> pkgDishList = new ArrayList<>();
-                for (PackageDishDto pkgDishDto : pkgDishDtoList) {
-                    Dish dish = dishRepository.findById(pkgDishDto.getId()).orElseThrow(() -> new DishNotFoundException("Dish could not be found"));
-                    PackageDish pkgDish = new PackageDish();
-                    pkgDish.setDishPrice(dish.getPrice());
-                    pkgDish.setPackageEntity(pkg);
-                    pkgDish.setQuantity(pkgDishDto.getQuantity());
-                    pkgDish.setDish(dish);
-                    pkgDishList.add(pkgDish);
-                }
-                pkg.setPackageDishes(pkgDishList);
-                Package savedPackage = packageRepository.save(pkg);
-                savedPackage.setCode(generatePackageCode(savedPackage.getId()));
-                packageRepository.save(savedPackage);
-            }
-        }
-
-        Package pkg = mapToPackage(pkgRequest, null);
+        Package pkg = mapToPackage(pkgRequest);
         List<PackageDish> pkgDishList = new ArrayList<>();
         for (PackageDishDto pkgDishDto : pkgDishDtoList) {
             Dish dish = dishRepository.findById(pkgDishDto.getId()).orElseThrow(() -> new DishNotFoundException("Dish could not be found"));
@@ -88,7 +65,7 @@ public class PackageImplement implements PackageService {
 
     @Override
     @Transactional
-    public void updatePackage(PackageResponse pkgRequest) {
+    public void updatePackage(PackageRequest pkgRequest) {
         List<PackageDishDto> pkgDishDtoList = pkgRequest.getPackageDishList();
         Package updatedPackage = mapToPackage(pkgRequest);
         Package existedPackage = packageRepository.findById(pkgRequest.getId()).orElseThrow(() -> new PackageNotFoundException("Package could not be found"));
@@ -141,7 +118,7 @@ public class PackageImplement implements PackageService {
 
     @Override
     @Transactional
-    public PackageResponse getAPackageDetail(int pkgId) {
+    public PackageRequest getAPackageDetail(int pkgId) {
         Package pkg = packageRepository.findById(pkgId).orElseThrow(() -> new PackageNotFoundException("Package could not be found"));
         List<PackageDishDto> dishDtoList = pkg.getPackageDishes().stream().map(this::mapToPackageDishDto).toList();
         return mapToPackageRequest(pkg, dishDtoList);
@@ -230,7 +207,7 @@ public class PackageImplement implements PackageService {
                 .build();
     }
 
-    private Package mapToPackage(PackageResponse pkgResponse) {
+    private Package mapToPackage(PackageRequest pkgResponse) {
         return Package.builder()
                 .id(pkgResponse.getId())
                 .name(pkgResponse.getName())
@@ -245,23 +222,8 @@ public class PackageImplement implements PackageService {
                 .build();
     }
 
-    private Package mapToPackage(PackageRequest pkgRequest, String thumbnailUrl) {
-        return Package.builder()
-                .id(pkgRequest.getId())
-                .name(pkgRequest.getName())
-                .description(pkgRequest.getDescription())
-                .code(pkgRequest.getCode())
-                .price(pkgRequest.getPrice())
-                .packageDishes(new ArrayList<>())
-                .packageType(pkgRequest.getPackageType())
-                .packageSize(pkgRequest.getPackageSize())
-                .active(pkgRequest.isActive())
-                .thumbnailUrl(thumbnailUrl)
-                .build();
-    }
-
-    private PackageResponse mapToPackageRequest(Package pkg, List<PackageDishDto> dishDtoList) {
-        return PackageResponse.builder()
+    private PackageRequest mapToPackageRequest(Package pkg, List<PackageDishDto> dishDtoList) {
+        return PackageRequest.builder()
                 .id(pkg.getId())
                 .name(pkg.getName())
                 .description(pkg.getDescription())
