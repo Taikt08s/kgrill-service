@@ -90,6 +90,18 @@ public class ShipperImplement implements ShipperService {
         return shipperList.map(this::mapToShipperDto);
     }
 
+    @Override
+    public boolean assignShipperToOrder(long shipperId, long orderId) {
+        Shipper shipper = shipperRepository.findById(shipperId).orElseThrow(() -> new RuntimeException("Shipper could not be found"));
+        DeliveryOrder deliveryOrder = deliveryOrderRepository.findById(orderId).orElseThrow(() -> new RuntimeException("Order could not be found"));
+        if (shipper.getStatus().equalsIgnoreCase("Available")){
+            deliveryOrder.setShipper(shipper);
+            deliveryOrderRepository.save(deliveryOrder);
+            return true;
+        }
+        return false;
+    }
+
     private ShipperDto mapToShipperDto(Shipper shipper){
         User user = userRepository.findById(UUID.fromString(shipper.getUuid()))
                 .orElseThrow( () -> new UsernameNotFoundException("User not found"));
