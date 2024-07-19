@@ -44,7 +44,7 @@ public class PackageImplement implements PackageService {
     }
 
     @Override
-    public void addPackage(PackageRequest pkgRequest){
+    public int addPackage(PackageRequest pkgRequest){
         List<PackageDishDto> pkgDishDtoList = pkgRequest.getPackageDishList();
         Package pkg = mapToPackage(pkgRequest);
         List<PackageDish> pkgDishList = new ArrayList<>();
@@ -61,6 +61,7 @@ public class PackageImplement implements PackageService {
         Package savedPackage = packageRepository.save(pkg);
         savedPackage.setCode(generatePackageCode(savedPackage.getId()));
         packageRepository.save(savedPackage);
+        return savedPackage.getId();
     }
 
     @Override

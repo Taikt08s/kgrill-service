@@ -11,7 +11,7 @@ import java.util.List;
 
 public interface PackageService{
 
-    void addPackage(PackageRequest pkgRequest);
+    int addPackage(PackageRequest pkgRequest);
 
     void updatePackage(PackageRequest pkgRequest);
 
