@@ -1,22 +1,24 @@
 package com.swd392.group2.kgrill_service.service;
 
 import com.swd392.group2.kgrill_service.dto.request.PackageRequest;
+import com.swd392.group2.kgrill_service.dto.response.PackageResponse;
 import com.swd392.group2.kgrill_service.dto.response.PackageDetailResponseForMobile;
 import com.swd392.group2.kgrill_service.dto.response.PackageResponseForAdminAndManager;
 import com.swd392.group2.kgrill_service.dto.response.PackageResponseForMobileAsList;
 import org.springframework.data.domain.Page;
 
+import java.io.IOException;
 import java.util.List;
 
 public interface PackageService{
 
-    void addPackage(PackageRequest pkgRequest, String imgUrl);
+    void addPackage(PackageRequest pkgRequest) throws IOException;
 
-    void updatePackage(PackageRequest pkgRequest);
+    void updatePackage(PackageResponse pkgRequest);
 
     void deletePackageById(int id);
 
-    PackageRequest getAPackageDetail(int pkgId);
+    PackageResponse getAPackageDetail(int pkgId);
 
     Page<PackageResponseForAdminAndManager> searchPackageByFilter(int pageNumber, int pageSize, String sortField, String sortDir);
 
