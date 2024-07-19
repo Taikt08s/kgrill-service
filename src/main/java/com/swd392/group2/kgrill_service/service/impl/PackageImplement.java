@@ -43,8 +43,9 @@ public class PackageImplement implements PackageService {
     }
 
     @Override
-    public void addPackage(PackageRequest pkgRequest) {
+    public void addPackage(PackageRequest pkgRequest, String imgUrl) {
         List<PackageDishDto> pkgDishDtoList = pkgRequest.getPackageDishList();
+        pkgRequest.setThumbnailUrl(imgUrl);
         Package pkg = mapToPackage(pkgRequest);
         List<PackageDish> pkgDishList = new ArrayList<>();
         for (PackageDishDto pkgDishDto : pkgDishDtoList) {
