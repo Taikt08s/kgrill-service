@@ -131,7 +131,7 @@ public class DishImplement implements DishService {
         sort = sortDir.equals("asc") ? sort.ascending() : sort.descending();
         Pageable pageable = PageRequest.of(pageNumber - 1, pageSize, sort);
         Page<Dish> dishes= dishRepository.findByNameAndPrice(keyword, category, minPrice, maxPrice, pageable);
-        return dishes;
+        return dishes;//
     }
     @Override
     public Page<DishDTO> getAllDishes(int pageNumber, int pageSize, String sortField, String sortDir) {
