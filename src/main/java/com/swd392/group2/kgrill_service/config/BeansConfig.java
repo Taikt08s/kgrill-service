@@ -48,9 +48,9 @@ public class BeansConfig {
         final CorsConfiguration config = new CorsConfiguration();
         config.setAllowCredentials(true);
         config.setAllowedOrigins(Arrays.asList(
-                "http://localhost:3000",
-                "http://localhost:4000",
-                "https://kgrill-frontend-lmjn.onrender.com"
+                "http://localhost:3000/api/v1/",
+                "http://localhost:4000/api/v1/",
+                "https://kgrill-frontend-lmjn.onrender.com/api/v1/"
         ));
         config.setAllowedHeaders(Arrays.asList(
                 HttpHeaders.ORIGIN,
