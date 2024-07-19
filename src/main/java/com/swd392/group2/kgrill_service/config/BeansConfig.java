@@ -17,7 +17,6 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 
 import java.util.Arrays;
-import java.util.List;
 
 @Configuration
 @RequiredArgsConstructor
@@ -48,12 +47,11 @@ public class BeansConfig {
         final UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         final CorsConfiguration config = new CorsConfiguration();
         config.setAllowCredentials(true);
-//        config.setAllowedOrigins(Arrays.asList(
-//                "http://localhost:3000",
-//                "http://localhost:4000",
-//                "https://kgrill-frontend-lmjn.onrender.com"
-//        ));
-        config.setAllowedOrigins(List.of("*"));
+        config.setAllowedOrigins(Arrays.asList(
+                "http://localhost:3000",
+                "http://localhost:4000",
+                "https://kgrill-frontend-lmjn.onrender.com"
+        ));
         config.setAllowedHeaders(Arrays.asList(
                 HttpHeaders.ORIGIN,
                 HttpHeaders.CONTENT_TYPE,
