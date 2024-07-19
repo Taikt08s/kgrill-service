@@ -1,8 +1,6 @@
 package com.swd392.group2.kgrill_service.dto.mobiledto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.swd392.group2.kgrill_model.model.OrderDetail;
-import com.swd392.group2.kgrill_model.model.PaymentMethod;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -25,15 +23,22 @@ public class DeliveryOrderDto {
     @JsonProperty("order_date")
     private Date orderDate;
 
+    @Schema(description = "Order's value", example = "2000000")
     @JsonProperty("order_value")
     private Long orderValue;
 
     @JsonProperty("shipper_date")
     private Date shippedDate;
 
+    @Schema(description = "Shipped address", example = "Duong so 2, Tang Nhon Phu A,....")
     @JsonProperty("shipped_address")
     private String shippedAddress;
 
+    @Schema(description = "User's phone number", example = "0965423786")
+    @JsonProperty("user_phone")
+    private String customerPhone;
+
+    @Schema(description = "Shipping fee", example = "20000")
     @JsonProperty("shipping_fee")
     private Long shippingFee;
 

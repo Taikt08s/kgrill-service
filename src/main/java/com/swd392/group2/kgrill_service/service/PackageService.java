@@ -13,6 +13,8 @@ public interface PackageService{
 
     int addPackage(PackageRequest pkgRequest);
 
+    PackageRequest preAddPackage();
+
     void updatePackage(PackageRequest pkgRequest);
 
     void deletePackageById(int id);
