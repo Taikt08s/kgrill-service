@@ -4,10 +4,7 @@ import com.swd392.group2.kgrill_model.model.*;
 import com.swd392.group2.kgrill_model.model.Package;
 import com.swd392.group2.kgrill_model.repository.*;
 import com.swd392.group2.kgrill_service.dto.*;
-import com.swd392.group2.kgrill_service.dto.mobiledto.DeliveryOrderDto;
-import com.swd392.group2.kgrill_service.dto.mobiledto.OrderDetailAfterLoginRequest;
-import com.swd392.group2.kgrill_service.dto.mobiledto.OrderDetailDto;
-import com.swd392.group2.kgrill_service.dto.mobiledto.OrderDetailDtoForOrderHistory;
+import com.swd392.group2.kgrill_service.dto.mobiledto.*;
 import com.swd392.group2.kgrill_service.dto.response.DeliveryOrderElement;
 import com.swd392.group2.kgrill_service.dto.response.DeliveryOrderForManager;
 import com.swd392.group2.kgrill_service.exception.CustomSuccessHandler;
@@ -28,7 +25,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.swing.text.html.parser.Entity;
-import java.sql.Date;
 import java.time.LocalDate;
 import java.time.Year;
 import java.time.YearMonth;
@@ -47,6 +43,7 @@ public class DeliveryOrderImpl implements DeliveryOrderService {
     private final PackageRepository packageRepository;
     private final ShipperRepository shipperRepository;
     private final UserRepository userRepository;
+    private final PaymentMethodRepository paymentMethodRepository;
     private final ModelMapper modelMapper;
 
     @Override
@@ -129,6 +126,36 @@ public class DeliveryOrderImpl implements DeliveryOrderService {
             orderDetailAfterLoginRequest.setOrderDetailList(orderDetailDtoList);
         }
         return orderDetailAfterLoginRequest;
+    }
+
+    public static String generateOrderCode(int orderNumber) {
+        String prefix = "OD-";
+        String formattedNumber = String.format("%05d", orderNumber);
+        return prefix + formattedNumber;
+    }
+
+    @Override
+    @Transactional
+    public boolean checkOutOrder(DeliveryOrderDtoForCheckOut deliveryOrderDtoForCheckOut) {
+        DeliveryOrder order = deliveryOrderRepository.findById(deliveryOrderDtoForCheckOut.getOrderId().longValue()).orElseThrow(() -> new RuntimeException("Order could not be found"));
+        if (order.getStatus().equalsIgnoreCase("Ordering")){
+            order.setOrderDate(new Date());
+            order.setOrderValue(deliveryOrderDtoForCheckOut.getOrderValue() != null ? deliveryOrderDtoForCheckOut.getOrderValue().floatValue() : 0);
+            order.setShippedAddress(deliveryOrderDtoForCheckOut.getShippedAddress());
+            order.setLatitude(deliveryOrderDtoForCheckOut.getLatitude());
+            order.setLongitude(deliveryOrderDtoForCheckOut.getLongitude());
+            order.setShippingFee(deliveryOrderDtoForCheckOut.getShippingFee() != null ? deliveryOrderDtoForCheckOut.getShippingFee().floatValue() : 0);
+            order.setStatus("Processing");
+            order.setPaymentMethod(paymentMethodRepository.findByMethod(deliveryOrderDtoForCheckOut.getPaymentMethod()));
+            order.getAccount().setCurrentOrder(null);
+            order.setAccountWithCurrentOrder(null);
+            DeliveryOrder savedOrder = deliveryOrderRepository.save(order);
+            savedOrder.setCode(generateOrderCode(savedOrder.getId()));
+            deliveryOrderRepository.save(savedOrder);
+            return true;
+        } else {
+            return false;
+        }
     }
 
     @Override
