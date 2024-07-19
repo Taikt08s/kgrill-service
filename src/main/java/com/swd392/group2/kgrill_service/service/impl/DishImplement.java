@@ -126,7 +126,7 @@ public class DishImplement implements DishService {
     }
 
     @Override
-    public Page<Dish> searchDishByFilter(int pageNumber, int pageSize, double minPrice, double maxPrice, String sortField, String sortDir, String keyword, String category) {
+    public Page<Dish> searchDishByFilter(int pageNumber, int pageSize, Double minPrice, Double maxPrice, String sortField, String sortDir, String keyword, String category) {
         Sort sort = Sort.by(sortField);
         sort = sortDir.equals("asc") ? sort.ascending() : sort.descending();
         Pageable pageable = PageRequest.of(pageNumber - 1, pageSize, sort);
