@@ -10,6 +10,7 @@ import com.swd392.group2.kgrill_model.repository.ShipperRepository;
 import com.swd392.group2.kgrill_model.repository.UserRepository;
 import com.swd392.group2.kgrill_service.dto.RevenueDetailElementResponse;
 import com.swd392.group2.kgrill_service.dto.RevenueDetailResponse;
+import com.swd392.group2.kgrill_service.dto.ShipperDto;
 import com.swd392.group2.kgrill_service.dto.response.ShipperInfoElement;
 import com.swd392.group2.kgrill_service.dto.response.ShipperInfoResponse;
 import com.swd392.group2.kgrill_service.exception.CustomSuccessHandler;
@@ -80,4 +81,23 @@ public class ShipperImplement implements ShipperService {
         return CustomSuccessHandler.responseBuilder(HttpStatus.OK,"Successfully retrieved all shippers", shipperInfoResponse);
     }
 
+    @Override
+    public Page<ShipperDto> getAvailableShipperList(int pageNumber, int pageSize, String sortField, String sortDir) {
+        Sort sort = Sort.by(sortField);
+        sort = sortDir.equals("asc") ? sort.ascending() : sort.descending();
+        Pageable pageable = PageRequest.of(pageNumber - 1, pageSize, sort);
+        Page<Shipper> shipperList = shipperRepository.findAllByStatus("Available", pageable);
+        return shipperList.map(this::mapToShipperDto);
+    }
+
+    private ShipperDto mapToShipperDto(Shipper shipper){
+        User user = userRepository.findById(UUID.fromString(shipper.getUuid()))
+                .orElseThrow( () -> new UsernameNotFoundException("User not found"));
+        return ShipperDto.builder()
+                .shipperId(shipper.getId())
+                .shipperName(user.fullName())
+                .shipperPhone(user.getPhone())
+                .shipperStatus(shipper.getStatus())
+                .build();
+    }
 }
