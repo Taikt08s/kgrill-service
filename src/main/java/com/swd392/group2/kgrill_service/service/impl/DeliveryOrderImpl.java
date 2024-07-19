@@ -24,7 +24,6 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.swing.text.html.parser.Entity;
 import java.time.LocalDate;
 import java.time.Year;
 import java.time.YearMonth;
@@ -146,6 +145,7 @@ public class DeliveryOrderImpl implements DeliveryOrderService {
             order.setLongitude(deliveryOrderDtoForCheckOut.getLongitude());
             order.setShippingFee(deliveryOrderDtoForCheckOut.getShippingFee() != null ? deliveryOrderDtoForCheckOut.getShippingFee().floatValue() : 0);
             order.setStatus("Processing");
+            order.setCustomerPhone(order.getAccount().getPhone());
             order.setPaymentMethod(paymentMethodRepository.findByMethod(deliveryOrderDtoForCheckOut.getPaymentMethod()));
             order.getAccount().setCurrentOrder(null);
             order.setAccountWithCurrentOrder(null);
@@ -513,6 +513,7 @@ public class DeliveryOrderImpl implements DeliveryOrderService {
                 .orderValue(deliveryOrder.getOrderValue() != null ? deliveryOrder.getOrderValue().longValue() : 0)
                 .shippedDate(deliveryOrder.getShippedDate())
                 .shippedAddress(deliveryOrder.getShippedAddress())
+                .customerPhone(deliveryOrder.getAccount().getPhone())
                 .shippingFee(deliveryOrder.getShippingFee() != null ? deliveryOrder.getShippingFee().longValue() : 0)
                 .status(deliveryOrder.getStatus())
                 .paymentMethod(deliveryOrder.getPaymentMethod() != null ? deliveryOrder.getPaymentMethod().getMethod() : null)
