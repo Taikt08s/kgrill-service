@@ -73,8 +73,8 @@ public class DeliveryOrderImpl implements DeliveryOrderService {
             user.setCurrentOrder(newOrder);
             user = userRepository.save(user);
         }
-        for (OrderDetail orderDetail : orderDetailRepository.findOrderDetailByOrderId(user.getCurrentOrder().getId())){
-            if (orderDetail.getPackageEntity().getId() == pkg.getId()){
+        for (OrderDetail orderDetail : orderDetailRepository.findOrderDetailByOrderId(user.getCurrentOrder().getId())) {
+            if (orderDetail.getPackageEntity().getId() == pkg.getId()) {
                 orderDetail.setQuantity(quantity);
                 orderDetailRepository.save(orderDetail);
                 return;
@@ -112,11 +112,11 @@ public class DeliveryOrderImpl implements DeliveryOrderService {
         OrderDetailAfterLoginRequest orderDetailAfterLoginRequest = new OrderDetailAfterLoginRequest();
         User currentUser = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User could not be found"));
 
-        if (currentUser.getCurrentOrder() != null){
+        if (currentUser.getCurrentOrder() != null) {
             int currentOrderId = currentUser.getCurrentOrder().getId();
 
             List<OrderDetail> orderDetailList = orderDetailRepository.findOrderDetailByOrderId(currentOrderId);
-            if (orderDetailList.isEmpty()){
+            if (orderDetailList.isEmpty()) {
                 return orderDetailAfterLoginRequest;
             }
             List<OrderDetailDto> orderDetailDtoList = orderDetailList.stream().map(this::mapToOrderDetailDto).toList();
@@ -137,7 +137,7 @@ public class DeliveryOrderImpl implements DeliveryOrderService {
     @Transactional
     public boolean checkOutOrder(DeliveryOrderDtoForCheckOut deliveryOrderDtoForCheckOut) {
         DeliveryOrder order = deliveryOrderRepository.findById(deliveryOrderDtoForCheckOut.getOrderId().longValue()).orElseThrow(() -> new RuntimeException("Order could not be found"));
-        if (order.getStatus().equalsIgnoreCase("Ordering")){
+        if (order.getStatus().equalsIgnoreCase("Ordering")) {
             order.setOrderDate(new Date());
             order.setOrderValue(deliveryOrderDtoForCheckOut.getOrderValue() != null ? deliveryOrderDtoForCheckOut.getOrderValue().floatValue() : 0);
             order.setShippedAddress(deliveryOrderDtoForCheckOut.getShippedAddress());
@@ -183,9 +183,9 @@ public class DeliveryOrderImpl implements DeliveryOrderService {
         if (deliveryOrder.getStatus() != null) {
             if (deliveryOrder.getStatus().equalsIgnoreCase("Delivered")) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Order is being delivered and cannot be cancelled");
-            }else if(deliveryOrder.getStatus().equalsIgnoreCase("Cancelled")){
+            } else if (deliveryOrder.getStatus().equalsIgnoreCase("Cancelled")) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Order cancelled already");
-            }else {
+            } else {
                 deliveryOrder.setStatus("Cancelled");
                 deliveryOrderRepository.save(deliveryOrder);
                 return CustomSuccessHandler.responseBuilder(HttpStatus.OK, "Cancel order successfully", "");
@@ -197,7 +197,7 @@ public class DeliveryOrderImpl implements DeliveryOrderService {
     @Override
     public boolean acceptOrderForManager(long orderId) {
         DeliveryOrder order = deliveryOrderRepository.findById(orderId).orElseThrow(() -> new RuntimeException("Order could not be found"));
-        if (order.getStatus() != null && order.getStatus().equalsIgnoreCase("Processing")){
+        if (order.getStatus() != null && order.getStatus().equalsIgnoreCase("Processing")) {
             order.setStatus("Preparing");
             deliveryOrderRepository.save(order);
             return true;
@@ -328,7 +328,6 @@ public class DeliveryOrderImpl implements DeliveryOrderService {
                     packageName.add(o.getPackageEntity().getName());
                 }
             }
-            d.setOrderValue(deliveryOrderPrice);
             d.setPackageName(packageName);
 
             //Lấy Username
@@ -338,6 +337,16 @@ public class DeliveryOrderImpl implements DeliveryOrderService {
             d.setPhone(users.getPhone());
             d.setAddress(users.getAddress());
 
+            //Lấy ShipperName
+            Optional<Shipper> shipper = shipperRepository.findById((long) d.getShipperId());
+
+            if (shipper.isEmpty()) {
+                d.setShipperName("Not assigned");
+            } else {
+                User user = userRepository.findById(UUID.fromString(shipper.get().getUuid()))
+                        .orElseThrow(() -> new ResourceNotFoundException("Shipper", "id", shipper.get().getUuid()));
+                d.setShipperName(user.getFirstName() + " " + user.getLastName());
+            }
         }
 
 
@@ -371,7 +380,6 @@ public class DeliveryOrderImpl implements DeliveryOrderService {
                     packageName.add(o.getPackageEntity().getName());
                 }
             }
-            d.setOrderValue(deliveryOrderPrice);
             d.setPackageName(packageName);
 
             //Lấy Username
@@ -487,7 +495,7 @@ public class DeliveryOrderImpl implements DeliveryOrderService {
         return new PageImpl<>(subList, pageable, sortedContent.size());
     }
 
-    private OrderDetailDto mapToOrderDetailDto(OrderDetail orderDetail){
+    private OrderDetailDto mapToOrderDetailDto(OrderDetail orderDetail) {
         return OrderDetailDto.builder()
                 .orderDetailId(orderDetail.getId())
                 .packageId(orderDetail.getPackageEntity().getId())
@@ -500,7 +508,7 @@ public class DeliveryOrderImpl implements DeliveryOrderService {
                 .build();
     }
 
-    private OrderDetailDtoForOrderHistory mapToOrderDetailDtoForOrderHistory(OrderDetail orderDetail){
+    private OrderDetailDtoForOrderHistory mapToOrderDetailDtoForOrderHistory(OrderDetail orderDetail) {
         return OrderDetailDtoForOrderHistory.builder()
                 .orderDetailId(orderDetail.getId())
                 .packageId(orderDetail.getPackageEntity().getId())
@@ -511,7 +519,7 @@ public class DeliveryOrderImpl implements DeliveryOrderService {
                 .build();
     }
 
-    private DeliveryOrderDto mapToDeliveryOrderDto(DeliveryOrder deliveryOrder){
+    private DeliveryOrderDto mapToDeliveryOrderDto(DeliveryOrder deliveryOrder) {
         return DeliveryOrderDto.builder()
                 .orderId(deliveryOrder.getId())
                 .orderDate(deliveryOrder.getOrderDate())
