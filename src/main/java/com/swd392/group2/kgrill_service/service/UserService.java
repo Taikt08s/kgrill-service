@@ -23,4 +23,6 @@ public interface UserService {
 
     boolean saveDeviceToken(UUID userId, String token);
 
+    String getDeviceTokenByUserId(UUID userId);
+
 }

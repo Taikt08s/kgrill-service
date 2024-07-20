@@ -221,6 +221,12 @@ public class UserImplement implements UserService {
         return false;
     }
 
+    @Override
+    public String getDeviceTokenByUserId(UUID userId) {
+        Optional<User> userOptional = userRepository.findById(userId);
+        return userOptional.map(User::getDeviceToken).orElse(null);
+    }
+
     private UserProfileDto mapToUserProfileDto(User user) {
         UserProfileDto userProfileDto = new UserProfileDto();
         userProfileDto.setId(user.getUserId());
