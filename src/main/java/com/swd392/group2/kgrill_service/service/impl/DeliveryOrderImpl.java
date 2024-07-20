@@ -305,11 +305,11 @@ public class DeliveryOrderImpl implements DeliveryOrderService {
     }
 
     @Override
-    public ResponseEntity<Object> getDeliveryOrderByStatus(int pageNo, int pageSize, String sortBy, String sortDir, String status) {
+    public ResponseEntity<Object> getOrderingList(int pageNo, int pageSize, String sortBy, String sortDir) {
         Sort sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
         Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
 
-        Page<DeliveryOrder> deliveryOrderPage = deliveryOrderRepository.getDeliveryOrderByStatus(status, pageable);
+        Page<DeliveryOrder> deliveryOrderPage = deliveryOrderRepository.getDeliveryOrder(pageable);
         List<DeliveryOrder> deliveryOrders = deliveryOrderPage.getContent();
 
         List<DeliveryOrderElement> content = deliveryOrders.stream()
@@ -318,13 +318,11 @@ public class DeliveryOrderImpl implements DeliveryOrderService {
 
         for (DeliveryOrderElement d : content) {
             List<String> packageName = new ArrayList<>();
-            float deliveryOrderPrice = 0;
             List<OrderDetail> orderDetails = orderDetailRepository.findOrderDetailByOrderId(d.getId());
 
             //tính tiền
             for (OrderDetail o : orderDetails) {
                 if (Objects.equals(o.getOrder().getId(), d.getId())) {
-                    deliveryOrderPrice += o.getComboPrice() * o.getQuantity();
                     packageName.add(o.getPackageEntity().getName());
                 }
             }
@@ -372,11 +370,9 @@ public class DeliveryOrderImpl implements DeliveryOrderService {
         for (RevenueDetailElementResponse d : content) {
             //Lấy ra các package name
             List<String> packageName = new ArrayList<>();
-            float deliveryOrderPrice = 0;
             List<OrderDetail> orderDetails = orderDetailRepository.findOrderDetailByOrderId(d.getId());
             for (OrderDetail o : orderDetails) {
                 if (Objects.equals(o.getOrder().getId(), d.getId())) {
-                    deliveryOrderPrice += o.getComboPrice() * o.getQuantity();
                     packageName.add(o.getPackageEntity().getName());
                 }
             }

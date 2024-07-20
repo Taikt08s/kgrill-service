@@ -37,6 +37,6 @@ public interface DeliveryOrderService {
 
     ResponseEntity<Object> getDeliveryOrderDetailByShipperId(int pageNo, int pageSize, String sortBy, String sortDir, int shipperId);
 
-    ResponseEntity<Object> getDeliveryOrderByStatus(int pageNo, int pageSize, String sortBy, String sortDir, String status);
+    ResponseEntity<Object> getOrderingList(int pageNo, int pageSize, String sortBy, String sortDir);
 
 }
