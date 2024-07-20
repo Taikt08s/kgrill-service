@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 @Builder
 @Data
@@ -19,6 +20,9 @@ public class DeliveryOrderDtoForCheckOut {
 
     @JsonProperty("delivery_order_id")
     private Integer orderId;
+
+    @JsonProperty("user_id")
+    private UUID userId;
 
     @JsonProperty("order_value")
     @Schema(description = "Order's value", example = "2000000")
