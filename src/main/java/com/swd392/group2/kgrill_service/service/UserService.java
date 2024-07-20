@@ -21,5 +21,6 @@ public interface UserService {
 
     ResponseEntity<Object> getNumberOfUsersByRoleId (String roleName);
 
+    boolean saveDeviceToken(UUID userId, String token);
 
 }
