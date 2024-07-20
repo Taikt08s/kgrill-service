@@ -37,7 +37,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(request -> request.requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/auth/**").permitAll()
                         .requestMatchers("/mobile/food-package/**").hasAuthority("USER")
                         .requestMatchers("/account/**").hasAnyAuthority("USER", "SHIPPER")
-                        .requestMatchers("/delivery-order/ordering").hasAuthority("MANAGER")
+                        .requestMatchers("/delivery-order/order-list").hasAuthority("MANAGER")
                         .requestMatchers("/admin/**").hasAuthority("ADMIN")
                         .requestMatchers("/dish/**", "/ingredient/**").hasAuthority("MANAGER")
                         .requestMatchers("/food-package/**").hasAnyAuthority("MANAGER", "ADMIN")
