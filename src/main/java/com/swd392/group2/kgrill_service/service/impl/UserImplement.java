@@ -29,6 +29,7 @@ import org.springframework.stereotype.Service;
 
 import java.text.ParseException;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -206,6 +207,18 @@ public class UserImplement implements UserService {
 
         long count = userRepository.countUserWithRoleId(roleId);
         return CustomSuccessHandler.responseBuilder(HttpStatus.OK, "Number of users retrieve successfully", count);
+    }
+
+    @Override
+    public boolean saveDeviceToken(UUID userId, String token) {
+        Optional<User> userOptional = userRepository.findById(userId);
+        if (userOptional.isPresent()) {
+            User user = userOptional.get();
+            user.setDeviceToken(token);
+            userRepository.save(user);
+            return true;
+        }
+        return false;
     }
 
     private UserProfileDto mapToUserProfileDto(User user) {
