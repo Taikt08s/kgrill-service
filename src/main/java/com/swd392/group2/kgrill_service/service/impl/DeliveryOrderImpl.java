@@ -134,6 +134,12 @@ public class DeliveryOrderImpl implements DeliveryOrderService {
     }
 
     @Override
+    public List<DeliveryOrderDto> getOrderHistoryBasedOnShipperId(int shipperId) {
+        List<DeliveryOrderDto> deliveryOrderDtos = deliveryOrderRepository.findAllByShipper_Id(shipperId).stream().map(this::mapToDeliveryOrderDto).toList();
+        return deliveryOrderDtos;
+    }
+
+    @Override
     @Transactional
     public boolean checkOutOrder(DeliveryOrderDtoForCheckOut deliveryOrderDtoForCheckOut) {
         DeliveryOrder order = deliveryOrderRepository.findById(deliveryOrderDtoForCheckOut.getOrderId().longValue()).orElseThrow(() -> new RuntimeException("Order could not be found"));

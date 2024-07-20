@@ -26,6 +26,8 @@ public interface DeliveryOrderService {
 
     boolean checkOutOrder(DeliveryOrderDtoForCheckOut deliveryOrderDtoForCheckOut);
 
+    List<DeliveryOrderDto> getOrderHistoryBasedOnShipperId(int shipperId);
+
     ResponseEntity<Object> getNumberOfOrders();
     ResponseEntity<Object> cancelOrderForManager(Long orderId);
 
