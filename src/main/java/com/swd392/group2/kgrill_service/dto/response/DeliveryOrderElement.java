@@ -20,6 +20,9 @@ public class DeliveryOrderElement {
     private Integer id;
 
     @JsonIgnore
+    private int shipperId;
+
+    @JsonIgnore
     private UUID accountId;
 
     @Schema(name = "User's ame", description = "Customer Name")
@@ -58,5 +61,7 @@ public class DeliveryOrderElement {
     @JsonProperty(value = "Order_status", index = 10)
     private String orderStatus;
 
+    @JsonProperty(value = "Shipper_name", index = 11)
+    private String shipperName;
 
 }
