@@ -9,6 +9,7 @@ import org.springframework.context.annotation.Configuration;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 @Configuration
@@ -17,7 +18,10 @@ public class FirebaseConfiguration {
     FirebaseMessaging firebaseMessaging() throws IOException {
         Map<String, String> env = System.getenv();
 
+        // Ensure private key formatting
         String privateKey = env.get("FIREBASE_PRIVATE_KEY").replace("\\n", "\n");
+
+        // Prepare JSON credentials string
         String jsonCredentials = String.format(
                 "{ \"type\": \"%s\", \"project_id\": \"%s\", \"private_key_id\": \"%s\", \"private_key\": \"%s\", \"client_email\": \"%s\", \"client_id\": \"%s\", \"auth_uri\": \"%s\", \"token_uri\": \"%s\", \"auth_provider_x509_cert_url\": \"%s\", \"client_x509_cert_url\": \"%s\" }",
                 env.get("FIREBASE_TYPE"),
@@ -32,12 +36,16 @@ public class FirebaseConfiguration {
                 env.get("FIREBASE_CLIENT_X509_CERT_URL")
         );
 
-        GoogleCredentials googleCredentials = GoogleCredentials.fromStream(new ByteArrayInputStream(jsonCredentials.getBytes()));
+        ByteArrayInputStream credentialsStream = new ByteArrayInputStream(jsonCredentials.getBytes(StandardCharsets.UTF_8));
+
+        GoogleCredentials googleCredentials = GoogleCredentials.fromStream(credentialsStream);
+
         FirebaseOptions firebaseOptions = FirebaseOptions.builder()
                 .setCredentials(googleCredentials)
                 .build();
 
         FirebaseApp app = FirebaseApp.initializeApp(firebaseOptions, "k-grill");
+
         return FirebaseMessaging.getInstance(app);
     }
 }
